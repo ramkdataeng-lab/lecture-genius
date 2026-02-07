@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LectureGenius Submission Guide</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style> body { font-family: 'Inter', sans-serif; } </style>
+</head>
+<body class="bg-slate-50 text-slate-900 p-8 max-w-4xl mx-auto">
+
+    <header class="mb-8 text-center">
+        <h1 class="text-4xl font-bold text-indigo-700 mb-2">LectureGenius Submission Plan</h1>
+        <p class="text-slate-600">Follow these steps to successfully submit your project to the Gemini 3 Hackathon.</p>
+    </header>
+
+    <div class="space-y-8">
+
+        <!-- Step 1: Code Repository -->
+        <section class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+            <h2 class="text-2xl font-bold text-slate-800 mb-4 flex items-center gap-2">
+                <span class="bg-indigo-100 text-indigo-600 w-8 h-8 rounded-full flex items-center justify-center text-sm">1</span>
+                Create Public Repository
+            </h2>
+            <p class="mb-4 text-slate-600">You must submit a link to a public code repository (GitHub is best).</p>
+            <div class="bg-slate-900 text-slate-200 p-4 rounded-xl font-mono text-sm overflow-x-auto">
+                <p class="text-green-400"># In your terminal (VS Code):</p>
+                <p>git init</p>
+                <p>git add .</p>
+                <p>git commit -m "Initial commit of LectureGenius"</p>
+                <p class="text-slate-500"># Go to GitHub.com -> New Repository -> Name it 'lecture-genius'</p>
+                <p>git remote add origin https://github.com/YOUR_USERNAME/lecture-genius.git</p>
+                <p>git push -u origin master</p>
+            </div>
+        </section>
+
+        <!-- Step 2: Deployment -->
+        <section class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+            <h2 class="text-2xl font-bold text-slate-800 mb-4 flex items-center gap-2">
+                <span class="bg-indigo-100 text-indigo-600 w-8 h-8 rounded-full flex items-center justify-center text-sm">2</span>
+                Deploy Your App (Recommended)
+            </h2>
+            <p class="mb-4 text-slate-600">Judges love to try the app. Vercel is the easiest way for Next.js.</p>
+            <ol class="list-decimal list-inside space-y-2 text-slate-700 ml-4">
+                <li>Go to <a href="https://vercel.com" target="_blank" class="text-indigo-600 underline">Vercel.com</a> and sign up.</li>
+                <li>Click "Add New Project" and import your <b>lecture-genius</b> GitHub repo.</li>
+                <li>In "Environment Variables", add all keys from your <code>.env.local</code> file:
+                    <ul class="list-disc list-inside ml-6 mt-1 text-sm text-slate-500">
+                        <li>GOOGLE_CLIENT_ID</li>
+                        <li>GOOGLE_CLIENT_SECRET</li>
+                        <li>GEMINI_API_KEY</li>
+                        <li>NEXTAUTH_SECRET</li>
+                        <li>NEXTAUTH_URL (Set this to your Vercel URL after deployment, e.g. https://lecture-genius.vercel.app)</li>
+                    </ul>
+                </li>
+                <li>Wait for deployment. <b>Update your Google Cloud Console</b> "Authorized Redirect URIs" to include your new Vercel domain (e.g. <code>https://lecture-genius.vercel.app/api/auth/callback/google</code>).</li>
+            </ol>
+        </section>
+
+        <!-- Step 3: Demo Video -->
+        <section class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+            <h2 class="text-2xl font-bold text-slate-800 mb-4 flex items-center gap-2">
+                <span class="bg-indigo-100 text-indigo-600 w-8 h-8 rounded-full flex items-center justify-center text-sm">3</span>
+                Record Demo Video (Crucial!)
+            </h2>
+            <p class="mb-4 text-slate-600">Record a 2-minute video (use Loom or OBS). Here is a script:</p>
+            <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4">
+                <ul class="space-y-2 text-slate-700">
+                    <li><b>0:00 - Intro:</b> "Hi, I'm [Name]. This is LectureGenius, an AI companion that ensures you never miss a detail in class."</li>
+                    <li><b>0:15 - Login:</b> Show the "Guest" landing page, then sign in with Google. Point out "Hello, [Name]".</li>
+                    <li><b>0:30 - Recording:</b> Click "Start Recording". Say a few sentences about Biology or History. Click "Stop".</li>
+                    <li><b>0:45 - Processing:</b> Show the "Processing..." state. Explain that Gemini 3 is analyzing the audio.</li>
+                    <li><b>1:00 - Results:</b> Show the result in the sidebar/history. Click "Open Folder".</li>
+                    <li><b>1:15 - Drive Integration:</b> Show the newly created folder in Google Drive. Open the <b>Google Doc</b> to show the formatted notes.</li>
+                    <li><b>1:45 - Translation:</b> Go back to the app, select "French" or "Spanish", and show the translation feature.</li>
+                    <li><b>2:00 - Outro:</b> "That's LectureGenius. Built with Gemini 3 and Next.js."</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Step 4: Submission Content -->
+        <section class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+            <h2 class="text-2xl font-bold text-slate-800 mb-4 flex items-center gap-2">
+                <span class="bg-indigo-100 text-indigo-600 w-8 h-8 rounded-full flex items-center justify-center text-sm">4</span>
+                Devpost Submission Content
+            </h2>
+            <p class="mb-6 text-slate-600">Copy and paste these answers into the Devpost form.</p>
+
+            <div class="space-y-6">
+                <div>
+                    <h3 class="font-bold text-slate-900 mb-1">Project Name</h3>
+                    <div class="bg-slate-100 p-3 rounded-lg text-slate-700 select-all">LectureGenius</div>
+                </div>
+
+                <div>
+                    <h3 class="font-bold text-slate-900 mb-1">Elevator Pitch (Short Description)</h3>
+                    <div class="bg-slate-100 p-3 rounded-lg text-slate-700 select-all">
+                        An AI-powered lecture companion that records, transcribes, summarizes, and translates lectures, syncing neatly formatted Google Docs directly to your Drive.
+                    </div>
+                </div>
+
+                <div>
+                    <h3 class="font-bold text-slate-900 mb-1">Inspiration</h3>
+                    <div class="bg-slate-100 p-3 rounded-lg text-slate-700 select-all">
+                        Students often struggle to keep up with fast-paced lectures, missing key details while trying to write everything down. We wanted to build a tool that allows students to actively listen in class, knowing that a perfect set of notes—organized and summarized—is being automatically generated and saved to their personal cloud storage.
+                    </div>
+                </div>
+
+                <div>
+                    <h3 class="font-bold text-slate-900 mb-1">What it does</h3>
+                    <div class="bg-slate-100 p-3 rounded-lg text-slate-700 select-all">
+                        LectureGenius uses the microphone to record live lectures. It then utilizes Google Gemini 3 (Flash) to process the audio directly. It generates a full transcript, a concise summary, and a list of key takeaways. <br><br>
+                        Uniquely, it doesn't just show this in the app; it integrates deeply with Google Drive. For every lecture, it creates a dedicated folder containing the original audio file and a professionally formatted Google Doc with all the notes. It also features a "Universal Translator" that can instantly convert these notes into over 20 languages, making education accessible to all.
+                    </div>
+                </div>
+
+                <div>
+                    <h3 class="font-bold text-slate-900 mb-1">How we built it</h3>
+                    <div class="bg-slate-100 p-3 rounded-lg text-slate-700 select-all">
+                        We built the frontend with <b>Next.js 14</b> and <b>Tailwind CSS</b> for a modern, responsive "Glassmorphism" UI. <br><br>
+                        The core intelligence is powered by <b>Google Gemini 3.0 Flash</b>, using its multimodal capabilities to process audio files directly without needing a separate speech-to-text step. <br><br>
+                        For storage and authentication, we used <b>NextAuth.js</b> with Google Provider and the <b>Google Drive API</b>. This allows the app to be "serverless" regarding user data—users own their data in their own Drive.
+                    </div>
+                </div>
+
+                <div>
+                    <h3 class="font-bold text-slate-900 mb-1">Challenges we ran into</h3>
+                    <div class="bg-slate-100 p-3 rounded-lg text-slate-700 select-all">
+                        Getting the Google Drive API permissions correct for creating folders and files on behalf of the user was tricky. We also had to ensure that the large audio blobs from the browser were handled efficiently before being sent to Gemini for processing. Formatting the markdown output from Gemini into a clean HTML structure for the Google Doc upload also required some fine-tuning.
+                    </div>
+                </div>
+
+                <div>
+                    <h3 class="font-bold text-slate-900 mb-1">Accomplishments that we're proud of</h3>
+                    <div class="bg-slate-100 p-3 rounded-lg text-slate-700 select-all">
+                        We are most proud of the seamless "One-Click" experience. A user hits record, stops, and minutes later, a folder appears in their Drive with everything they need. The deep linking from the app's history directly to the Drive folder feels magical.
+                    </div>
+                </div>
+
+                <div>
+                    <h3 class="font-bold text-slate-900 mb-1">What we learned</h3>
+                    <div class="bg-slate-100 p-3 rounded-lg text-slate-700 select-all">
+                        We learned how powerful the Gemini multimodal API is—processing raw audio directly is much faster and more context-aware than traditional transcription pipelines. We also gained a deeper understanding of OAuth 2.0 scopes and the Google Drive file system structure.
+                    </div>
+                </div>
+
+                <div>
+                    <h3 class="font-bold text-slate-900 mb-1">What's next for LectureGenius</h3>
+                    <div class="bg-slate-100 p-3 rounded-lg text-slate-700 select-all">
+                        Next, we plan to build a React Native mobile app for on-the-go recording. We also want to implement "Real-time" transcription (streaming) so users can see notes appear as the professor speaks, and add a "Flashcard Generator" feature that creates Anki decks from the lecture summaries.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+</body>
+</html>

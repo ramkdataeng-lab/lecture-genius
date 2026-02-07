@@ -1,0 +1,87 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+:root {
+  --background: #f8fafc;
+  /* Slate 50 */
+  --foreground: #0f172a;
+  /* Slate 900 */
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Reference UI Styles */
+@layer utilities {
+  .bg-gradient-header {
+    /* Updated to match logo: Deep Slate/Black -> Violet -> Cyan hint */
+    background: linear-gradient(135deg, #0f172a 0%, #2e1065 60%, #0891b2 100%);
+  }
+
+  .sidebar-nav-item {
+    color: #64748b;
+    /* Slate 500 */
+    border-left: 3px solid transparent;
+    transition: all 0.2s;
+  }
+
+  .sidebar-nav-item:hover,
+  .sidebar-nav-item.active {
+    color: #7c3aed;
+    /* Violet 600 - Matches "Genius" / Brain */
+    background-color: #f5f3ff;
+    /* Violet 50 */
+    border-left-color: #06b6d4;
+    /* Cyan 500 - Matches "Lecture" */
+  }
+
+  /* Custom scrollbar for translation box */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 4px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 4px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+  }
+}
+
+/* Mic Button Pulse Animation */
+@keyframes pulse-ring {
+  0% {
+    transform: scale(0.8);
+    opacity: 0.8;
+  }
+
+  100% {
+    transform: scale(1.3);
+    opacity: 0;
+  }
+}
+
+.mic-pulse::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 50%;
+  border: 1px solid #ef4444;
+  animation: pulse-ring 1.5s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+}

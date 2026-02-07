@@ -1,0 +1,156 @@
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { uploadToDrive, ensureFolderHierarchy } from "@/lib/drive";
+import { uploadAudioToGemini, generateLectureNotes } from "@/lib/gemini";
+import fs from "fs";
+import path from "path";
+import os from "os";
+
+export async function POST(req: NextRequest) {
+    try {
+        const session = await getServerSession(authOptions);
+
+        const formData = await req.formData();
+        const file = formData.get("audio") as File;
+        const lectureTitle = (formData.get("title") as string) || "Untitled Lecture";
+        const subject = (formData.get("subject") as string) || "General";
+        const folderStructure = (formData.get("folderStructure") as string) || "date-subject"; // or "subject-date"
+
+        if (!file) {
+            return NextResponse.json({ error: "No file uploaded" }, { status: 400 });
+        }
+
+        // Determine Folder Hierarchy
+        let targetFolderId = "LectureGenius"; // Default fallback (will be resolved to ID if it stays string)
+        let useAsFolderId = false;
+
+        if (session && session.accessToken) {
+            try {
+                const dateStr = new Date().toISOString().split('T')[0];
+                let pathParts = ["LectureGenius"];
+
+                if (folderStructure === "subject-date") {
+                    pathParts.push(subject);
+                    pathParts.push(dateStr);
+                } else {
+                    // Default: date-subject
+                    pathParts.push(dateStr);
+                    pathParts.push(subject);
+                }
+
+                targetFolderId = await ensureFolderHierarchy(session.accessToken, pathParts) || "LectureGenius";
+                useAsFolderId = true;
+            } catch (err) {
+                console.error("Error creating folder hierarchy:", err);
+                // Fallback to default "LectureGenius" folder
+            }
+        }
+
+        // 2. Upload Audio to User's Google Drive (Only if logged in)
+        let driveAudioFile = null;
+        if (session && session.accessToken) {
+            try {
+                driveAudioFile = await uploadToDrive(
+                    session.accessToken,
+                    Buffer.from(await file.arrayBuffer()),
+                    `${lectureTitle}.webm`,
+                    targetFolderId, // Use the resolved ID
+                    "LectureGenius", // Description
+                    "", // MimeType
+                    useAsFolderId // useAsFolderId
+                );
+            } catch (driveError) {
+                console.error("Drive Upload Error:", driveError);
+            }
+        }
+
+        // 3. Process with Gemini
+        // Upload to Gemini File API (Uses API Key, works for Guests too)
+        const arrayBuffer = await file.arrayBuffer();
+        const buffer = Buffer.from(arrayBuffer);
+        const tempFilePath = path.join(os.tmpdir(), `${Date.now()}_recording.webm`);
+        await fs.promises.writeFile(tempFilePath, buffer);
+
+        const geminiFile = await uploadAudioToGemini(tempFilePath, file.type || "audio/webm");
+
+        // Generate Notes/Transcript
+        let notesText = await generateLectureNotes(geminiFile.uri, geminiFile.mimeType);
+
+        // Clean markdown code blocks if present
+        notesText = notesText.replace(/```json/g, "").replace(/```/g, "").trim();
+
+        // 4. Save Transcript to User's Google Drive (Only if logged in)
+        if (session && session.accessToken) {
+            try {
+                const transcriptBuffer = Buffer.from(notesText);
+                const notesObj = JSON.parse(notesText);
+                const summarySnippet = notesObj.summary || "No summary available";
+
+                // Generate HTML for Google Doc
+                const htmlContent = `
+                    <html>
+                    <head><style>body { font-family: Arial, sans-serif; line-height: 1.6; }</style></head>
+                    <body>
+                        <h1>${notesObj.title || lectureTitle}</h1>
+                        <p><strong>Date:</strong> ${new Date().toLocaleDateString()}</p>
+                        <hr/>
+                        <h2>Summary</h2>
+                        <p>${notesObj.summary}</p>
+                        
+                        <h2>Key Points</h2>
+                        <ul>
+                        ${Array.isArray(notesObj.key_points) ? notesObj.key_points.map((p: string) => `<li>${p}</li>`).join('') : `<li>${notesObj.key_points}</li>`}
+                        </ul>
+                        
+                        <h2>Detailed Notes</h2>
+                        <div>${(notesObj.detailed_notes || "").replace(/\n/g, '<br/>')}</div>
+                        
+                        <hr/>
+                        <p style="color: #666; font-size: 0.8em;">Generated by LectureGenius AI</p>
+                    </body>
+                    </html>
+                `;
+
+                // Upload JSON (for App History)
+                await uploadToDrive(
+                    session.accessToken,
+                    transcriptBuffer,
+                    `${lectureTitle}_Notes.json`,
+                    targetFolderId,
+                    summarySnippet.substring(0, 1000),
+                    "",
+                    useAsFolderId
+                );
+
+                // Upload Google Doc (for User Viewing)
+                await uploadToDrive(
+                    session.accessToken,
+                    Buffer.from(htmlContent),
+                    lectureTitle, // Google Doc name (no extension needed usually, but Drive handles it)
+                    targetFolderId,
+                    "AI Generated Lecture Notes",
+                    "application/vnd.google-apps.document", // Convert to Google Doc
+                    useAsFolderId
+                );
+            } catch (err) {
+                console.error("Transcript Drive Upload Error", err);
+            }
+        } else {
+            console.log("Skipping Drive upload for Guest user.");
+        }
+
+        // Cleanup temp file
+        await fs.promises.unlink(tempFilePath);
+
+        return NextResponse.json({
+            success: true,
+            driveAudio: driveAudioFile,
+            notes: notesText
+        });
+
+    } catch (error) {
+        console.error("Processing Error:", error);
+        return NextResponse.json({ error: "Internal Server Error", details: error }, { status: 500 });
+    }
+}
