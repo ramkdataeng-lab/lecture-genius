@@ -63,6 +63,7 @@ export default function RecordPage() {
     const chunksRef = useRef<Blob[]>([]);
     const timerRef = useRef<NodeJS.Timeout | null>(null);
     const [captions, setCaptions] = useState("");
+    const finalTranscriptRef = useRef<string>("");  // Store all final transcripts
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const audioContextRef = useRef<AudioContext | null>(null);
     const analyserRef = useRef<AnalyserNode | null>(null);
@@ -72,6 +73,7 @@ export default function RecordPage() {
     const startRecording = async () => {
         setError("");
         setCaptions("");
+        finalTranscriptRef.current = ""; // Reset transcript
         try {
             const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
             const recorder = new MediaRecorder(stream);
@@ -153,20 +155,29 @@ export default function RecordPage() {
                     let finalTranscript = '';
 
                     for (let i = event.resultIndex; i < event.results.length; ++i) {
+                        const transcript = event.results[i][0].transcript;
                         if (event.results[i].isFinal) {
-                            finalTranscript += event.results[i][0].transcript;
+                            finalTranscript += transcript + ' ';
                         } else {
-                            interimTranscript += event.results[i][0].transcript;
+                            interimTranscript += transcript;
                         }
                     }
-                    if (finalTranscript || interimTranscript) {
-                        setCaptions(prev => {
-                            // Keep only last few lines to avoid overflow in preview
-                            const full = prev + (finalTranscript ? " " + finalTranscript : "");
-                            return full.slice(-200) + (interimTranscript ? " " + interimTranscript : "");
-                        });
+
+                    // Update final transcript ref
+                    if (finalTranscript) {
+                        finalTranscriptRef.current += finalTranscript;
                     }
+
+                    // Display only the last ~150 characters of final + current interim
+                    const allText = finalTranscriptRef.current + interimTranscript;
+                    const displayText = allText.slice(-150); // Keep last 150 chars
+                    setCaptions(displayText);
                 };
+
+                recognition.onerror = (event: any) => {
+                    console.error('Speech recognition error:', event.error);
+                };
+
 
                 recognition.start();
                 recognitionRef.current = recognition;
