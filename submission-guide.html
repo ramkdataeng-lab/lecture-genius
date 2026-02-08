@@ -66,7 +66,8 @@
                 </li>
                 <li>Wait for deployment. <b>Update your Google Cloud Console</b> "Authorized Redirect URIs" to include
                     your new Vercel domain (e.g.
-                    <code>https://lecture-genius.vercel.app/api/auth/callback/google</code>).</li>
+                    <code>https://lecture-genius.vercel.app/api/auth/callback/google</code>).
+                </li>
             </ol>
         </section>
 
@@ -77,23 +78,34 @@
                     class="bg-indigo-100 text-indigo-600 w-8 h-8 rounded-full flex items-center justify-center text-sm">3</span>
                 Record Demo Video (Crucial!)
             </h2>
-            <p class="mb-4 text-slate-600">Record a 2-minute video (use Loom or OBS). Here is a script:</p>
+            <p class="mb-4 text-slate-600">Record a 2-3 minute video (use Loom or OBS). Here is a script:</p>
             <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4">
                 <ul class="space-y-2 text-slate-700">
                     <li><b>0:00 - Intro:</b> "Hi, I'm [Name]. This is LectureGenius, an AI companion that ensures you
                         never miss a detail in class."</li>
                     <li><b>0:15 - Login:</b> Show the "Guest" landing page, then sign in with Google. Point out "Hello,
                         [Name]".</li>
-                    <li><b>0:30 - Recording:</b> Click "Start Recording". Say a few sentences about Biology or History.
-                        Click "Stop".</li>
-                    <li><b>0:45 - Processing:</b> Show the "Processing..." state. Explain that Gemini 3 is analyzing the
-                        audio.</li>
-                    <li><b>1:00 - Results:</b> Show the result in the sidebar/history. Click "Open Folder".</li>
-                    <li><b>1:15 - Drive Integration:</b> Show the newly created folder in Google Drive. Open the
-                        <b>Google Doc</b> to show the formatted notes.</li>
-                    <li><b>1:45 - Translation:</b> Go back to the app, select "French" or "Spanish", and show the
-                        translation feature.</li>
-                    <li><b>2:00 - Outro:</b> "That's LectureGenius. Built with Gemini 3 and Next.js."</li>
+                    <li><b>0:30 - Recording:</b> Click "Start Recording". <b>Highlight the live audio visualizer</b>
+                        (animated waveform)
+                        and <b>real-time captions</b> appearing as you speak. Say a few sentences about Biology or
+                        History.</li>
+                    <li><b>0:50 - Visual Feedback:</b> Point out how the visualizer proves the mic is working and the
+                        live captions
+                        show what you're saying in real-time. Click "Stop".</li>
+                    <li><b>1:05 - Processing:</b> Show the "Processing..." state. Explain that Gemini 3 is analyzing the
+                        audio and generating summaries.</li>
+                    <li><b>1:20 - Results:</b> Show the result with the summary. Click "Open Folder" or check the Recent
+                        Activity section.</li>
+                    <li><b>1:35 - Drive Integration:</b> Show the newly created folder in Google Drive. Open the
+                        <b>Google Doc</b> to show the formatted notes. <b>Show the translated version</b> if you set a
+                        default language.
+                    </li>
+                    <li><b>1:55 - Translation:</b> Go back to the app, select "French" or "Spanish", and show the
+                        on-demand translation feature.</li>
+                    <li><b>2:20 - Settings:</b> Briefly show the Settings page where users can set their default
+                        language for automatic translation.</li>
+                    <li><b>2:40 - Outro:</b> "That's LectureGenius. Built with Gemini 3, Next.js, and a mission to
+                        democratize education globally."</li>
                 </ul>
             </div>
         </section>
@@ -136,9 +148,14 @@
                     <div class="bg-slate-100 p-3 rounded-lg text-slate-700 select-all">
                         LectureGenius is an AI-powered educational companion with a social mission: to democratize
                         access to knowledge. <br><br>
-                        It records live lectures and uses Google Gemini 3 (Flash) to instantly generate transcripts,
-                        summaries, and key takeaways. More importantly, it features a <b>Universal Translator</b> that
-                        converts these notes into over 50 languages. <br><br>
+                        It records live lectures with a <b>real-time audio visualizer</b> and <b>live captions</b> that
+                        show what you're saying as you speak,
+                        providing instant visual feedback that the recording is working. <br><br>
+                        Using Google Gemini 3 (Flash), it instantly generates transcripts,
+                        summaries, and key takeaways. More importantly, it features a <b>Universal Translator</b> with
+                        <b>automatic translation</b>
+                        that converts these notes into over 50 languages based on your default language setting.
+                        <br><br>
                         By saving everything as neatly formatted Google Docs directly in the user's Drive, it allows
                         students to focus on listening and understanding, rather than frantically taking notes.
                     </div>
@@ -149,6 +166,11 @@
                     <div class="bg-slate-100 p-3 rounded-lg text-slate-700 select-all">
                         We built the frontend with <b>Next.js 14</b> and <b>Tailwind CSS</b> for a modern, responsive
                         "Glassmorphism" UI. <br><br>
+                        The <b>live audio visualizer</b> uses the Web Audio API (AudioContext and AnalyserNode) to
+                        create real-time
+                        frequency visualizations with smooth canvas animations. The <b>live captions</b> leverage the
+                        Web Speech Recognition API
+                        for instant transcription as you speak. <br><br>
                         The core intelligence is powered by <b>Google Gemini 3.0 Flash</b>, using its multimodal
                         capabilities to process audio files directly without needing a separate speech-to-text step.
                         <br><br>
@@ -173,7 +195,13 @@
                     <div class="bg-slate-100 p-3 rounded-lg text-slate-700 select-all">
                         We are most proud of the seamless "One-Click" experience. A user hits record, stops, and minutes
                         later, a folder appears in their Drive with everything they need. The deep linking from the
-                        app's history directly to the Drive folder feels magical.
+                        app's history directly to the Drive folder feels magical. <br><br>
+                        We're also proud of the <b>live audio visualizer and real-time captions</b> that provide instant
+                        feedback
+                        during recording—solving the "black box" problem where users wonder if their mic is working. The
+                        <b>automatic translation</b>
+                        feature that reads user preferences and creates translated docs without any extra clicks is
+                        another highlight.
                     </div>
                 </div>
 
@@ -195,6 +223,39 @@
                         summaries.
                     </div>
                 </div>
+            </div>
+        </section>
+
+        <!-- Step 5: Final Submission -->
+        <section class="bg-gradient-to-r from-indigo-500 to-purple-600 p-8 rounded-2xl shadow-lg text-white">
+            <h2 class="text-3xl font-bold mb-4 flex items-center gap-2">
+                <span
+                    class="bg-white text-indigo-600 w-10 h-10 rounded-full flex items-center justify-center text-lg">5</span>
+                Submit to Devpost
+            </h2>
+            <p class="mb-6 text-indigo-100">You're ready! Follow these final steps:</p>
+
+            <ol class="list-decimal list-inside space-y-3 text-white ml-4 mb-6">
+                <li>Go to the <a href="https://gemini-api-competition.devpost.com/" target="_blank"
+                        class="underline font-bold hover:text-indigo-200">Gemini API Developer Competition on
+                        Devpost</a></li>
+                <li>Click <b>"Submit Your Project"</b> (or "Join + Submit" if you haven't joined yet)</li>
+                <li>Fill in the form with the content from Step 4 above (copy-paste from the gray boxes)</li>
+                <li>Add your:
+                    <ul class="list-disc list-inside ml-6 mt-2 text-sm text-indigo-100">
+                        <li><b>GitHub Repository URL</b>: https://github.com/YOUR_USERNAME/lecture-genius</li>
+                        <li><b>Demo Video URL</b>: Your Loom or YouTube link</li>
+                        <li><b>Live Demo URL</b> (optional but recommended): https://lecture-genius.vercel.app</li>
+                    </ul>
+                </li>
+                <li>Upload a <b>cover image</b> (screenshot of your app or the logo)</li>
+                <li>Select <b>"Google Gemini API"</b> as the technology used</li>
+                <li>Click <b>"Submit"</b> 🎉</li>
+            </ol>
+
+            <div class="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-4">
+                <p class="text-sm"><b>Pro Tip:</b> After submitting, share your project on Twitter/LinkedIn with
+                    #GeminiAPI and tag @GoogleDevs to increase visibility!</p>
             </div>
         </section>
 
