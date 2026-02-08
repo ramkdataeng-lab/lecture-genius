@@ -4,7 +4,7 @@ import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
-import { Mic, FolderOpen, LogOut, LayoutDashboard, Settings } from "lucide-react";
+import { Mic, FolderOpen, LogOut, LayoutDashboard, Settings, Workflow, Calendar, Info } from "lucide-react";
 import { useState, useEffect } from "react";
 
 export function Sidebar() {
@@ -23,8 +23,6 @@ export function Sidebar() {
                 .catch(err => console.error(err));
         }
     }, [session]);
-
-    // if (!session) return null; // Allow Guest Sidebar
 
     const NavItem = ({ href, icon: Icon, label, isActive }: any) => (
         <Link
@@ -62,8 +60,11 @@ export function Sidebar() {
                     <nav className="space-y-1">
                         <NavItem href="/" icon={LayoutDashboard} label="Dashboard" isActive={pathname === "/"} />
                         <NavItem href="/record" icon={Mic} label="Record Lecture" isActive={pathname === "/record"} />
+                        <NavItem href="/schedule" icon={Calendar} label="Sync Schedule" isActive={pathname === "/schedule"} />
                         <NavItem href={folderLink} icon={FolderOpen} label="My Recordings" />
                         <NavItem href="/settings" icon={Settings} label="Settings" isActive={pathname === "/settings"} />
+                        <NavItem href="/workflow" icon={Workflow} label="AI Workflow" isActive={pathname === "/workflow"} />
+                        <NavItem href="/about" icon={Info} label="About" isActive={pathname === "/about"} />
                     </nav>
                 </div>
             </div>
@@ -72,24 +73,31 @@ export function Sidebar() {
                 {session ? (
                     <>
                         <div className="flex items-center gap-3 mb-4 px-2">
-
                             <div className="flex-1 min-w-0">
                                 <p className="text-sm font-semibold text-slate-800 truncate">{session.user?.name}</p>
                                 <p className="text-xs text-slate-500 truncate">{session.user?.email}</p>
                             </div>
                         </div>
-                        <Link href="/api/auth/signout" className="flex items-center gap-2 text-xs font-medium text-slate-500 hover:text-red-600 transition-colors px-2">
+                        <Link href="/api/auth/signout" className="flex items-center gap-2 text-xs font-medium text-slate-500 hover:text-red-600 transition-colors px-2 mb-4">
                             <LogOut className="w-3.5 h-3.5" /> Sign Out
                         </Link>
                     </>
                 ) : (
-                    <div className="flex flex-col gap-3 px-2">
+                    <div className="flex flex-col gap-3 px-2 mb-4">
                         <p className="text-sm font-medium text-slate-500">Guest Mode</p>
                         <button onClick={() => window.location.href = "/api/auth/signin/google"} className="text-xs font-bold text-violet-600 hover:underline">
                             Sign In with Google
                         </button>
                     </div>
                 )}
+
+                <div className="pt-4 border-t border-slate-200/60 flex flex-col gap-0.5">
+                    <p className="text-[10px] font-medium text-slate-400">© 2026 LectureGenius</p>
+                    <p className="text-[10px] text-slate-400">Dev: <span className="font-semibold text-slate-500">Ramkumar</span></p>
+                    <a href="mailto:ramkgvn@gmail.com" className="text-[10px] text-indigo-400 hover:text-indigo-600 transition-colors truncate block font-medium mt-0.5">
+                        ramkgvn@gmail.com
+                    </a>
+                </div>
             </div>
         </aside>
     );

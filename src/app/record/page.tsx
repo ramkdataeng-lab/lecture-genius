@@ -26,7 +26,8 @@ export default function RecordPage() {
     const [result, setResult] = useState<any>(null);
     const [error, setError] = useState("");
     const [translatedContent, setTranslatedContent] = useState<string | null>(null);
-    const [targetLang, setTargetLang] = useState("English");
+    const [targetLang, setTargetLang] = useState("Spanish");
+    const [spokenLanguage, setSpokenLanguage] = useState("English");
     const [isTranslating, setIsTranslating] = useState(false);
     const [showHistory, setShowHistory] = useState(false);
     const [history, setHistory] = useState<any[]>([]);
@@ -56,8 +57,50 @@ export default function RecordPage() {
         }
     }, [showHistory, recordingState]);
 
+    useEffect(() => {
+        if (recordingState === "recording" && analyserRef.current && canvasRef.current) {
+            const canvas = canvasRef.current;
+            const ctx = canvas.getContext("2d");
+            const analyser = analyserRef.current;
+            if (!ctx || !analyser) return;
+
+            const draw = () => {
+                const bufferLength = analyser.frequencyBinCount;
+                const dataArray = new Uint8Array(bufferLength);
+                analyser.getByteFrequencyData(dataArray);
+
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                const width = canvas.width;
+                const height = canvas.height;
+                const barWidth = (width / bufferLength) * 2.5;
+                let x = 0;
+
+                for (let i = 0; i < bufferLength; i++) {
+                    const barHeight = (dataArray[i] / 255) * height; // Scale relative to height
+
+                    const gradient = ctx.createLinearGradient(0, 0, 0, height);
+                    gradient.addColorStop(0, '#818cf8');
+                    gradient.addColorStop(1, '#c084fc');
+
+                    ctx.fillStyle = gradient;
+                    ctx.fillRect(x, height - barHeight, barWidth, barHeight);
+
+                    x += barWidth + 1;
+                }
+
+                animationFrameRef.current = requestAnimationFrame(draw);
+            };
+            draw();
+
+            return () => {
+                if (animationFrameRef.current) cancelAnimationFrame(animationFrameRef.current);
+            };
+        }
+    }, [recordingState]);
+
     const LANGUAGES = [
-        "Spanish", "French", "German", "Chinese (Simplified)", "Chinese (Traditional)", "Japanese", "Korean", "Russian", "Portuguese", "Italian", "Dutch", "Polish", "Turkish", "Vietnamese", "Thai", "Arabic", "Hindi", "Bengali", "Urdu", "Indonesian", "Malay", "Persian", "Hebrew", "Greek", "Czech", "Swedish", "Hungarian", "Romanian", "Danish", "Finnish", "Norwegian", "Slovak", "Bulgarian", "Ukrainian", "Catalan", "Serbian", "Croatian", "Lithuanian", "Slovenian", "Latvian", "Estonian", "Filipino", "Swahili", "Tamil", "Telugu", "Marathi", "Gujarati", "Kannada", "Malayalam", "Punjabi"
+        "English", "Spanish", "French", "German", "Chinese (Simplified)", "Chinese (Traditional)", "Japanese", "Korean", "Russian", "Portuguese", "Italian", "Dutch", "Polish", "Turkish", "Vietnamese", "Thai", "Arabic", "Hindi", "Bengali", "Urdu", "Indonesian", "Malay", "Persian", "Hebrew", "Greek", "Czech", "Swedish", "Hungarian", "Romanian", "Danish", "Finnish", "Norwegian", "Slovak", "Bulgarian", "Ukrainian", "Catalan", "Serbian", "Croatian", "Lithuanian", "Slovenian", "Latvian", "Estonian", "Filipino", "Swahili", "Tamil", "Telugu", "Marathi", "Gujarati", "Kannada", "Malayalam", "Punjabi"
     ];
 
     const chunksRef = useRef<Blob[]>([]);
@@ -108,38 +151,7 @@ export default function RecordPage() {
             source.connect(analyser);
             analyserRef.current = analyser;
 
-            const drawVisualizer = () => {
-                if (!canvasRef.current) return;
-                const canvas = canvasRef.current;
-                const ctx = canvas.getContext("2d");
-                if (!ctx) return;
 
-                const bufferLength = analyser.frequencyBinCount;
-                const dataArray = new Uint8Array(bufferLength);
-                analyser.getByteFrequencyData(dataArray);
-
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-                const barWidth = (canvas.width / bufferLength) * 2.5;
-                let barHeight;
-                let x = 0;
-
-                for (let i = 0; i < bufferLength; i++) {
-                    barHeight = dataArray[i] / 2;
-
-                    const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-                    gradient.addColorStop(0, '#818cf8'); // Indigo-400
-                    gradient.addColorStop(1, '#c084fc'); // Purple-500
-
-                    ctx.fillStyle = gradient;
-                    ctx.fillRect(x, canvas.height - barHeight, barWidth, barHeight);
-
-                    x += barWidth + 1;
-                }
-
-                animationFrameRef.current = requestAnimationFrame(drawVisualizer);
-            };
-            drawVisualizer();
 
 
             // --- Live Captions Strategy (Web Speech API) ---
@@ -148,7 +160,19 @@ export default function RecordPage() {
                 const recognition = new SpeechRecognition();
                 recognition.continuous = true;
                 recognition.interimResults = true;
-                recognition.lang = 'en-US'; // Default to English for now
+
+                // Set language based on user selection
+                const getLangCode = (lang: string) => {
+                    const map: Record<string, string> = {
+                        "English": "en-US", "Spanish": "es-ES", "French": "fr-FR", "German": "de-DE",
+                        "Chinese (Simplified)": "zh-CN", "Chinese (Traditional)": "zh-TW", "Japanese": "ja-JP",
+                        "Korean": "ko-KR", "Russian": "ru-RU", "Portuguese": "pt-BR", "Italian": "it-IT",
+                        "Dutch": "nl-NL", "Polish": "pl-PL", "Turkish": "tr-TR", "Vietnamese": "vi-VN",
+                        "Thai": "th-TH", "Arabic": "ar-SA", "Hindi": "hi-IN"
+                    };
+                    return map[lang] || "en-US";
+                };
+                recognition.lang = getLangCode(spokenLanguage);
 
                 recognition.onresult = (event: any) => {
                     let interimTranscript = '';
@@ -213,6 +237,7 @@ export default function RecordPage() {
         formData.append("subject", subject || "General");
         formData.append("folderStructure", folderStructure);
         formData.append("targetLanguage", targetLang);
+        formData.append("spokenLanguage", spokenLanguage);
 
         try {
             const res = await fetch("/api/process-lecture", {
@@ -220,14 +245,46 @@ export default function RecordPage() {
                 body: formData,
             });
 
-            if (!res.ok) throw new Error("Processing failed");
+            if (!res.ok) {
+                const errorText = await res.text();
+                let errorMessage = "Processing failed";
+                try {
+                    const errorJson = JSON.parse(errorText);
+                    errorMessage = errorJson.error || (typeof errorJson.details === 'string' ? errorJson.details : JSON.stringify(errorJson.details)) || errorMessage;
+                } catch {
+                    errorMessage = errorText || errorMessage;
+                }
+                throw new Error(errorMessage);
+            }
 
             const data = await res.json();
             setResult(data);
+
+            if (data.translatedNotes) {
+                const notes = data.translatedNotes;
+                const formattedTranslation = `
+# ${notes.title}
+
+## Summary
+${notes.summary}
+
+## Key Points
+${Array.isArray(notes.key_points) ? notes.key_points.map((p: string) => `- ${p}`).join('\n') : notes.key_points}
+
+## Detailed Notes
+${notes.detailed_notes}
+                 `.trim();
+                setTranslatedContent(formattedTranslation);
+            }
+
             setRecordingState("completed");
-        } catch (err) {
+        } catch (err: any) {
             console.error(err);
-            setError("Failed to process lecture completely. Check Drive for raw audio.");
+            let msg = err.message || "Failed to process lecture completely.";
+            if (msg.includes("429") || msg.includes("Quota") || msg.includes("Rate Limit")) {
+                msg = "API Quota Exceeded. Please try again later.";
+            }
+            setError(msg);
             setRecordingState("idle");
         }
     };
@@ -360,11 +417,20 @@ ${notes.detailed_notes}
                             {/* Background decoration inside card */}
                             <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-50 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none opacity-50"></div>
 
+                            {/* Error Message Display */}
+                            {error && (
+                                <div className="mb-8 p-4 bg-red-50 border border-red-200 rounded-xl text-red-600 font-medium flex items-center justify-center gap-2 animate-in fade-in slide-in-from-top-4 w-full max-w-lg z-20 relative">
+                                    <AlertCircle className="w-5 h-5 flex-shrink-0" />
+                                    <span>{error}</span>
+                                </div>
+                            )}
+
                             {recordingState === "idle" && (
                                 <>
                                     <input
                                         type="text"
                                         placeholder="Lecture Title (Optional)"
+
                                         className="w-full max-w-md bg-transparent text-3xl font-bold text-center placeholder:text-slate-300 outline-none border-b-2 border-transparent focus:border-indigo-100 text-slate-800 tracking-tight mb-4 pb-2 transition-colors relative z-10"
                                         value={lectureTitle}
                                         onChange={(e) => setLectureTitle(e.target.value)}
@@ -380,6 +446,17 @@ ${notes.detailed_notes}
 
                                     <div className="text-8xl font-mono text-slate-800 font-bold mb-16 tracking-tighter relative z-10">
                                         0:00
+                                    </div>
+
+                                    <div className="mb-6 flex flex-col items-center gap-2 z-10 relative">
+                                        <label className="text-slate-500 font-medium text-xs uppercase tracking-wider">Spoken Language</label>
+                                        <select
+                                            value={spokenLanguage}
+                                            onChange={(e) => setSpokenLanguage(e.target.value)}
+                                            className="bg-white/80 backdrop-blur border border-slate-200 text-slate-700 text-sm rounded-full px-4 py-2 outline-none focus:ring-2 focus:ring-indigo-500 shadow-sm cursor-pointer hover:bg-white transition-all text-center appearance-none min-w-[140px]"
+                                        >
+                                            {LANGUAGES.map(lang => <option key={lang} value={lang}>{lang}</option>)}
+                                        </select>
                                     </div>
 
                                     <div className="flex items-center gap-8 relative z-10">

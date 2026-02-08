@@ -4,13 +4,23 @@ import { Sidebar } from "@/components/Sidebar";
 import { useState, useEffect } from "react";
 
 const LANGUAGES = [
-    // Top 50 Languages
-    "Spanish", "French", "German", "Chinese (Simplified)", "Chinese (Traditional)", "Japanese", "Korean", "Russian", "Portuguese", "Italian", "Dutch", "Polish", "Turkish", "Vietnamese", "Thai", "Arabic", "Hindi", "Bengali", "Urdu", "Indonesian", "Malay", "Persian", "Hebrew", "Greek", "Czech", "Swedish", "Hungarian", "Romanian", "Danish", "Finnish", "Norwegian", "Slovak", "Bulgarian", "Ukrainian", "Catalan", "Serbian", "Croatian", "Lithuanian", "Slovenian", "Latvian", "Estonian", "Filipino", "Swahili", "Tamil", "Telugu", "Marathi", "Gujarati", "Kannada", "Malayalam", "Punjabi"
+    "English", "Spanish", "French", "German", "Chinese (Simplified)", "Chinese (Traditional)", "Japanese", "Korean", "Russian", "Portuguese", "Italian", "Dutch", "Polish", "Turkish", "Vietnamese", "Thai", "Arabic", "Hindi", "Bengali", "Urdu", "Indonesian", "Malay", "Persian", "Hebrew", "Greek", "Czech", "Swedish", "Hungarian", "Romanian", "Danish", "Finnish", "Norwegian", "Slovak", "Bulgarian", "Ukrainian", "Catalan", "Serbian", "Croatian", "Lithuanian", "Slovenian", "Latvian", "Estonian", "Filipino", "Swahili", "Tamil", "Telugu", "Marathi", "Gujarati", "Kannada", "Malayalam", "Punjabi"
+];
+
+const LMS_PLATFORMS = [
+    "Canvas Instructure",
+    "Blackboard Learn",
+    "Moodle",
+    "Google Classroom",
+    "Brightspace (D2L)",
+    "Sakai",
+    "Schoology",
+    "Microsoft Teams for Education"
 ];
 
 export default function SettingsPage() {
     const [folderStructure, setFolderStructure] = useState("date-subject");
-    const [defaultLanguage, setDefaultLanguage] = useState("English");
+    const [defaultLanguage, setDefaultLanguage] = useState("Spanish");
     const [showSuccess, setShowSuccess] = useState(false);
 
     useEffect(() => {
@@ -92,6 +102,58 @@ export default function SettingsPage() {
                                     <option key={lang} value={lang}>{lang}</option>
                                 ))}
                             </select>
+                        </div>
+
+                        <hr className="border-slate-100" />
+
+                        {/* LMS Configuration */}
+                        <div>
+                            <div className="flex items-center gap-3 mb-4">
+                                <h2 className="text-xl font-bold text-slate-800">Course Management (LMS)</h2>
+                                <span className="px-2.5 py-0.5 bg-indigo-50 text-indigo-600 text-[10px] font-bold uppercase tracking-wider rounded-full border border-indigo-100 shadow-sm">
+                                    Coming Soon
+                                </span>
+                            </div>
+                            <p className="text-sm text-slate-500 mb-6">Configure access to your university portal for auto-sync.</p>
+
+                            <div className="space-y-4">
+                                <div>
+                                    <label className="block text-xs font-bold text-slate-700 uppercase mb-1">Platform</label>
+                                    <select
+                                        className="w-full p-3 rounded-lg border border-slate-200 bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+                                        disabled
+                                    >
+                                        <option>Select LMS...</option>
+                                        {LMS_PLATFORMS.map((lms) => (
+                                            <option key={lms}>{lms}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="block text-xs font-bold text-slate-700 uppercase mb-1">Username / Email</label>
+                                        <input
+                                            type="text"
+                                            placeholder="student@university.edu"
+                                            className="w-full p-3 rounded-lg border border-slate-200 bg-slate-50 text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+                                            disabled
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs font-bold text-slate-700 uppercase mb-1">Password</label>
+                                        <input
+                                            type="password"
+                                            placeholder="••••••••"
+                                            className="w-full p-3 rounded-lg border border-slate-200 bg-slate-50 text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+                                            disabled
+                                        />
+                                    </div>
+                                </div>
+                                <p className="text-[10px] text-slate-400 font-medium flex items-center gap-1">
+                                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                                    Credentials will be encrypted and stored locally on your device.
+                                </p>
+                            </div>
                         </div>
 
                         {/* Save Button */}

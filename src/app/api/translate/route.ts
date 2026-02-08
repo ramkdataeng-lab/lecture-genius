@@ -6,9 +6,10 @@ import { translateContent } from "@/lib/gemini";
 export async function POST(req: NextRequest) {
     try {
         const session = await getServerSession(authOptions);
-        if (!session) {
-            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-        }
+        // Allow guests to translate as well
+        // if (!session) {
+        //     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        // }
 
         const { text, targetLanguage } = await req.json();
 

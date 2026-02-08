@@ -4,25 +4,16 @@ import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { Sidebar } from "@/components/Sidebar";
 import Image from "next/image";
-import { Mic, FolderOpen, Brain, ChevronRight, PlayCircle, FileText, ExternalLink } from "lucide-react";
+import { Mic, FolderOpen, Brain, PlayCircle, FileText, ExternalLink } from "lucide-react";
 import { useState, useEffect } from "react";
 
 export default function Home() {
   const { data: session, status } = useSession();
   const [recentActivity, setRecentActivity] = useState<any[]>([]);
   const [loadingActivity, setLoadingActivity] = useState(false);
-
-  const QuickAction = ({ icon: Icon, title, desc, link, color }: any) => (
-    <Link href={link} className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all group flex flex-col items-center text-center h-full justify-center">
-      <div className={`w-12 h-12 rounded-xl ${color} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
-        <Icon className="w-6 h-6 text-white" />
-      </div>
-      <h3 className="font-bold text-slate-800 mb-1">{title}</h3>
-      <p className="text-xs text-slate-400 font-medium">{desc}</p>
-    </Link>
-  );
-
   const [folderLink, setFolderLink] = useState("https://drive.google.com/drive/u/0/search?q=LectureGenius");
+
+  const userName = status === "loading" ? "..." : (session?.user?.name?.split(' ')[0] || session?.user?.email?.split('@')[0] || "Guest");
 
   useEffect(() => {
     if (session) {
@@ -40,7 +31,7 @@ export default function Home() {
         .then(res => res.json())
         .then(data => {
           if (data.files) {
-            // Filter for _Notes.json only (just to be safe, though API does it now)
+            // Filter for _Notes.json only
             const notes = data.files.filter((f: any) => f.name.includes('_Notes.json'));
             setRecentActivity(notes.slice(0, 5)); // Top 5
           }
@@ -50,7 +41,15 @@ export default function Home() {
     }
   }, [session]);
 
-  const userName = status === "loading" ? "..." : (session?.user?.name?.split(' ')[0] || session?.user?.email?.split('@')[0] || "Guest");
+  const QuickAction = ({ icon: Icon, title, desc, link, color }: any) => (
+    <Link href={link} className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all group flex flex-col items-center text-center h-full justify-center">
+      <div className={`w-12 h-12 rounded-xl ${color} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
+        <Icon className="w-6 h-6 text-white" />
+      </div>
+      <h3 className="font-bold text-slate-800 mb-1">{title}</h3>
+      <p className="text-xs text-slate-400 font-medium">{desc}</p>
+    </Link>
+  );
 
   return (
     <div className="bg-slate-50 min-h-screen flex font-sans">
@@ -110,15 +109,10 @@ export default function Home() {
             {/* Abstract Background Shapes */}
             <div className="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
             <div className="absolute bottom-0 left-0 w-64 h-64 bg-indigo-900/20 rounded-full blur-2xl translate-y-1/3 -translate-x-1/3 pointer-events-none"></div>
-
-            {/* Big Hero Logo */}
-            <div className="absolute top-6 right-6 md:top-10 md:right-10 opacity-20 transform rotate-12 pointer-events-none">
-              <Image src="/logo.png" width={200} height={200} alt="LectureGenius Hero Logo" className="drop-shadow-2xl" />
-            </div>
           </div>
         </div>
 
-        {/* Quick Actions Grid (Simplified) */}
+        {/* Quick Actions Grid */}
         <div className="mb-10">
           <h2 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4 px-1">Actions</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

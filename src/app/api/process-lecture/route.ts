@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { uploadToDrive, ensureFolderHierarchy } from "@/lib/drive";
-import { uploadAudioToGemini, generateLectureNotes } from "@/lib/gemini";
+import { uploadAudioToGemini, generateLectureNotes, translateJsonObject } from "@/lib/gemini";
 import fs from "fs";
 import path from "path";
 import os from "os";
@@ -47,13 +47,17 @@ export async function POST(req: NextRequest) {
             }
         }
 
+        // Read file buffer once
+        const arrayBuffer = await file.arrayBuffer();
+        const buffer = Buffer.from(arrayBuffer);
+
         // 2. Upload Audio to User's Google Drive (Only if logged in)
         let driveAudioFile = null;
         if (session && session.accessToken) {
             try {
                 driveAudioFile = await uploadToDrive(
                     session.accessToken,
-                    Buffer.from(await file.arrayBuffer()),
+                    buffer,
                     `${lectureTitle}.webm`,
                     targetFolderId, // Use the resolved ID
                     "LectureGenius", // Description
@@ -67,27 +71,74 @@ export async function POST(req: NextRequest) {
 
         // 3. Process with Gemini
         // Upload to Gemini File API (Uses API Key, works for Guests too)
-        const arrayBuffer = await file.arrayBuffer();
-        const buffer = Buffer.from(arrayBuffer);
         const tempFilePath = path.join(os.tmpdir(), `${Date.now()}_recording.webm`);
         await fs.promises.writeFile(tempFilePath, buffer);
 
         const geminiFile = await uploadAudioToGemini(tempFilePath, file.type || "audio/webm");
 
-        // Generate Notes/Transcript
-        let notesText = await generateLectureNotes(geminiFile.uri, geminiFile.mimeType);
+        // Generate Notes ALWAYS in English first (Base Comprehension)
+        const spokenLang = formData.get("spokenLanguage") as string || "English";
+        const targetLang = formData.get("targetLanguage") as string || "English";
+
+        // Force English for the main notes to ensure comprehension is always available in English
+        let notesText = await generateLectureNotes(geminiFile.uri, geminiFile.mimeType, spokenLang, "English");
 
         // Clean markdown code blocks if present
         notesText = notesText.replace(/```json/g, "").replace(/```/g, "").trim();
 
         // 4. Save Transcript to User's Google Drive (Only if logged in)
+        // Create notes object
+        let notesObj;
+        try {
+            notesObj = JSON.parse(notesText);
+        } catch (e) {
+            console.error("Failed to parse notes JSON:", e);
+            notesObj = { title: lectureTitle, summary: notesText, key_points: [], detailed_notes: notesText };
+        }
+
+        // --- Prepare Data for Frontend & Drive ---
+
+        let translatedNotesData = null;
+        let translatedHtml = "";
+
+        // If a specific target language (non-English) was requested, translate the English notes
+        if (targetLang && targetLang !== "English") {
+            try {
+                console.log(`Translating notes to ${targetLang}...`);
+                translatedNotesData = await translateJsonObject(notesObj, targetLang);
+
+                // Generate HTML for the "Translated" doc
+                translatedHtml = `
+                    <html>
+                    <head><style>body { font-family: Arial, sans-serif; line-height: 1.6; }</style></head>
+                    <body>
+                        <h1>${translatedNotesData.title || notesObj.title} (${targetLang})</h1>
+                        <p><strong>Date:</strong> ${new Date().toLocaleDateString()}</p>
+                        <hr/>
+                        <h2>Summary</h2>
+                        <p>${translatedNotesData.summary || ""}</p>
+                        <h2>Key Points</h2>
+                        <ul>${Array.isArray(translatedNotesData.key_points) ? translatedNotesData.key_points.map((p: string) => `<li>${p}</li>`).join('') : `<li>${translatedNotesData.key_points}</li>`}</ul>
+                        <h2>Detailed Notes</h2>
+                        <div>${(translatedNotesData.detailed_notes || "").replace(/\n/g, '<br/>')}</div>
+                        <hr/>
+                        <p style="color: #666; font-size: 0.8em;">Translated to ${targetLang} by LectureGenius AI</p>
+                    </body>
+                    </html>
+                `;
+            } catch (transErr) {
+                console.error("Translation Failed:", transErr);
+                // Fallback: Don't break the main flow, just skip translation return
+            }
+        }
+
+        // 4. Save Transcript to User's Google Drive (Only if logged in)
         if (session && session.accessToken) {
             try {
                 const transcriptBuffer = Buffer.from(notesText);
-                const notesObj = JSON.parse(notesText);
                 const summarySnippet = notesObj.summary || "No summary available";
 
-                // Generate HTML for Google Doc
+                // Generate Original HTML
                 let htmlContent = `
                     <html>
                     <head><style>body { font-family: Arial, sans-serif; line-height: 1.6; }</style></head>
@@ -97,68 +148,19 @@ export async function POST(req: NextRequest) {
                         <hr/>
                         <h2>Summary</h2>
                         <p>${notesObj.summary}</p>
-                        
                         <h2>Key Points</h2>
-                        <ul>
+                         <ul>
                         ${Array.isArray(notesObj.key_points) ? notesObj.key_points.map((p: string) => `<li>${p}</li>`).join('') : `<li>${notesObj.key_points}</li>`}
                         </ul>
-                        
                         <h2>Detailed Notes</h2>
                         <div>${(notesObj.detailed_notes || "").replace(/\n/g, '<br/>')}</div>
-                        
                         <hr/>
                         <p style="color: #666; font-size: 0.8em;">Generated by LectureGenius AI</p>
                     </body>
                     </html>
                 `;
 
-                // Check for default target language and translate if needed
-                const targetLanguage = formData.get("targetLanguage") as string;
-                if (targetLanguage && targetLanguage !== "English") {
-                    try {
-                        const { translateContent } = await import("@/lib/gemini");
-                        // Parallel translation for speed
-                        const [transSummary, transNotes, transPoints] = await Promise.all([
-                            translateContent(notesObj.summary || "", targetLanguage),
-                            translateContent(notesObj.detailed_notes || "", targetLanguage),
-                            translateContent((notesObj.key_points || []).join('\n'), targetLanguage)
-                        ]);
-
-                        const translatedHtml = `
-                            <html>
-                            <head><style>body { font-family: Arial, sans-serif; line-height: 1.6; }</style></head>
-                            <body>
-                                <h1>${notesObj.title} (${targetLanguage})</h1>
-                                <p><strong>Date:</strong> ${new Date().toLocaleDateString()}</p>
-                                <hr/>
-                                <h2>Summary</h2>
-                                <p>${transSummary}</p>
-                                <h2>Key Points</h2>
-                                <ul>${transPoints.split('\n').map((p: string) => `<li>${p}</li>`).join('')}</ul>
-                                <h2>Detailed Notes</h2>
-                                <div>${transNotes.replace(/\n/g, '<br/>')}</div>
-                                <hr/>
-                                <p style="color: #666; font-size: 0.8em;">Translated to ${targetLanguage} by LectureGenius AI</p>
-                            </body>
-                            </html>
-                         `;
-
-                        // Upload Translated Doc
-                        await uploadToDrive(
-                            session.accessToken,
-                            Buffer.from(translatedHtml),
-                            `${lectureTitle} (${targetLanguage})`,
-                            targetFolderId,
-                            "AI Translated Lecture Notes",
-                            "application/vnd.google-apps.document",
-                            useAsFolderId
-                        );
-                    } catch (transError) {
-                        console.error("Translation Error:", transError);
-                    }
-                }
-
-                // Upload JSON (for App History)
+                // Upload JSON
                 await uploadToDrive(
                     session.accessToken,
                     transcriptBuffer,
@@ -169,7 +171,7 @@ export async function POST(req: NextRequest) {
                     useAsFolderId
                 );
 
-                // Upload Google Doc (Original)
+                // Upload Original Doc
                 await uploadToDrive(
                     session.accessToken,
                     Buffer.from(htmlContent),
@@ -179,6 +181,20 @@ export async function POST(req: NextRequest) {
                     "application/vnd.google-apps.document",
                     useAsFolderId
                 );
+
+                // Upload Translated Doc (if exists)
+                if (translatedNotesData && translatedHtml) {
+                    await uploadToDrive(
+                        session.accessToken,
+                        Buffer.from(translatedHtml),
+                        `${lectureTitle} (${targetLang})`,
+                        targetFolderId,
+                        "AI Translated Lecture Notes",
+                        "application/vnd.google-apps.document",
+                        useAsFolderId
+                    );
+                }
+
             } catch (err) {
                 console.error("Transcript Drive Upload Error", err);
             }
@@ -192,11 +208,15 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({
             success: true,
             driveAudio: driveAudioFile,
-            notes: notesText
+            notes: notesText,
+            translatedNotes: translatedNotesData
         });
 
-    } catch (error) {
+    } catch (error: any) {
         console.error("Processing Error:", error);
-        return NextResponse.json({ error: "Internal Server Error", details: error }, { status: 500 });
+        return NextResponse.json({
+            error: error.message || String(error),
+            details: String(error)
+        }, { status: 500 });
     }
 }
