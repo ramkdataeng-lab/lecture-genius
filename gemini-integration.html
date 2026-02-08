@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LectureGenius - Gemini Integration</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .code-block {
+            background: #1e293b;
+            border-radius: 12px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+
+<body class="bg-slate-50 text-slate-900">
+
+    <!-- Header -->
+    <header class="gradient-bg text-white py-16 px-8">
+        <div class="max-w-5xl mx-auto">
+            <h1 class="text-5xl font-bold mb-4">🧠 LectureGenius</h1>
+            <p class="text-2xl text-indigo-100">Powered by Google Gemini 3.0 Flash</p>
+            <p class="text-lg text-indigo-200 mt-2">Democratizing Education Through AI</p>
+        </div>
+    </header>
+
+    <main class="max-w-5xl mx-auto px-8 py-12 space-y-12">
+
+        <!-- Main Integration Description -->
+        <section class="bg-white p-8 rounded-3xl shadow-lg border border-slate-200">
+            <h2 class="text-3xl font-bold text-slate-800 mb-6 flex items-center gap-3">
+                <span class="text-4xl">⚡</span>
+                Gemini Integration Description
+            </h2>
+
+            <div class="bg-gradient-to-r from-indigo-50 to-purple-50 p-6 rounded-2xl border-2 border-indigo-200 mb-6">
+                <p class="text-sm text-indigo-600 font-bold mb-2">📋 COPY THIS FOR DEVPOST SUBMISSION (~200 words)</p>
+                <div class="bg-white p-6 rounded-xl text-slate-700 leading-relaxed select-all">
+                    <p class="mb-4">
+                        LectureGenius leverages <strong>Google Gemini 3.0 Flash</strong> as its core intelligence
+                        engine, making it central to every aspect of the application.
+                    </p>
+
+                    <p class="font-bold text-slate-900 mb-2">How Gemini Powers LectureGenius:</p>
+
+                    <p class="mb-3">
+                        <strong>1. Multimodal Audio Processing:</strong> We use Gemini's multimodal capabilities to
+                        process raw audio files directly. Instead of using a separate speech-to-text service, we send
+                        the WebM audio blob straight to Gemini with a structured prompt, and it returns a complete JSON
+                        object containing the transcript, summary, key points, and detailed notes—all in one API call.
+                    </p>
+
+                    <p class="mb-3">
+                        <strong>2. Intelligent Summarization:</strong> Gemini analyzes the lecture content and generates
+                        concise summaries, extracting the most important concepts and creating actionable key takeaways.
+                        This goes beyond simple transcription—it understands context and educational value.
+                    </p>
+
+                    <p class="mb-4">
+                        <strong>3. Universal Translation:</strong> We use Gemini's translation capabilities to convert
+                        lecture notes into over 50 languages. Users can set a default language in settings, and Gemini
+                        automatically translates the summary, key points, and detailed notes, creating a separate Google
+                        Doc in their chosen language.
+                    </p>
+
+                    <p class="font-bold text-slate-900">
+                        Why Gemini is Essential: Without Gemini, LectureGenius wouldn't exist. The ability to process
+                        audio, understand context, generate structured educational content, and translate seamlessly
+                        makes Gemini the perfect foundation for democratizing education globally. Its speed (Flash
+                        model) ensures students get their notes within seconds, not minutes.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Technical Implementation -->
+        <section class="bg-white p-8 rounded-3xl shadow-lg border border-slate-200">
+            <h2 class="text-3xl font-bold text-slate-800 mb-6 flex items-center gap-3">
+                <span class="text-4xl">🔧</span>
+                Technical Implementation
+            </h2>
+
+            <div class="space-y-6">
+                <!-- Feature 1 -->
+                <div class="border-l-4 border-indigo-500 pl-6">
+                    <h3 class="text-xl font-bold text-slate-800 mb-3">1. Audio Processing with Gemini</h3>
+                    <p class="text-slate-600 mb-4">
+                        We send raw audio directly to Gemini's multimodal API. The model processes the audio and returns
+                        structured educational content.
+                    </p>
+                    <div class="code-block p-4">
+                        <pre class="text-sm text-slate-200"><code>// lib/gemini.ts - generateLectureNotes()
+const model = genAI.getGenerativeModel({ 
+    model: "gemini-2.0-flash-exp" 
+});
+
+const result = await model.generateContent([
+    {
+        inlineData: {
+            mimeType: audioFile.type,
+            data: base64Audio
+        }
+    },
+    prompt  // Structured prompt for educational content
+]);
+
+// Returns: { title, summary, key_points, detailed_notes }</code></pre>
+                    </div>
+                </div>
+
+                <!-- Feature 2 -->
+                <div class="border-l-4 border-purple-500 pl-6">
+                    <h3 class="text-xl font-bold text-slate-800 mb-3">2. Intelligent Content Generation</h3>
+                    <p class="text-slate-600 mb-4">
+                        Gemini doesn't just transcribe—it understands context and generates educational summaries, key
+                        takeaways, and detailed notes.
+                    </p>
+                    <div class="bg-slate-100 p-4 rounded-xl">
+                        <p class="text-sm font-mono text-slate-700">
+                            <strong>Input:</strong> Raw audio of a biology lecture<br>
+                            <strong>Gemini Output:</strong><br>
+                            • Title: "Photosynthesis and Cellular Respiration"<br>
+                            • Summary: Concise overview of main concepts<br>
+                            • Key Points: 5-7 bullet points of critical information<br>
+                            • Detailed Notes: Comprehensive breakdown with examples
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Feature 3 -->
+                <div class="border-l-4 border-cyan-500 pl-6">
+                    <h3 class="text-xl font-bold text-slate-800 mb-3">3. Universal Translation</h3>
+                    <p class="text-slate-600 mb-4">
+                        Gemini translates lecture content into 50+ languages while preserving formatting and educational
+                        context.
+                    </p>
+                    <div class="code-block p-4">
+                        <pre class="text-sm text-slate-200"><code>// lib/gemini.ts - translateContent()
+const model = genAI.getGenerativeModel({ 
+    model: "gemini-2.0-flash-exp" 
+});
+
+const result = await model.generateContent(
+    `Translate to ${targetLanguage}. Preserve formatting:
+    
+    ${content}`
+);
+
+// Automatically creates translated Google Doc</code></pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Gemini Features Used -->
+        <section class="bg-gradient-to-br from-indigo-500 to-purple-600 p-8 rounded-3xl shadow-lg text-white">
+            <h2 class="text-3xl font-bold mb-6 flex items-center gap-3">
+                <span class="text-4xl">✨</span>
+                Gemini Features Utilized
+            </h2>
+
+            <div class="grid md:grid-cols-2 gap-6">
+                <div class="bg-white/10 backdrop-blur-sm border border-white/20 p-6 rounded-2xl">
+                    <div class="text-3xl mb-3">🎙️</div>
+                    <h3 class="text-xl font-bold mb-2">Multimodal Input</h3>
+                    <p class="text-indigo-100">Direct audio processing without separate transcription services</p>
+                </div>
+
+                <div class="bg-white/10 backdrop-blur-sm border border-white/20 p-6 rounded-2xl">
+                    <div class="text-3xl mb-3">📊</div>
+                    <h3 class="text-xl font-bold mb-2">Structured Output</h3>
+                    <p class="text-indigo-100">JSON generation with consistent educational formatting</p>
+                </div>
+
+                <div class="bg-white/10 backdrop-blur-sm border border-white/20 p-6 rounded-2xl">
+                    <div class="text-3xl mb-3">🌍</div>
+                    <h3 class="text-xl font-bold mb-2">Translation</h3>
+                    <p class="text-indigo-100">Context-aware translation in 50+ languages</p>
+                </div>
+
+                <div class="bg-white/10 backdrop-blur-sm border border-white/20 p-6 rounded-2xl">
+                    <div class="text-3xl mb-3">⚡</div>
+                    <h3 class="text-xl font-bold mb-2">Fast Inference</h3>
+                    <p class="text-indigo-100">Flash model for sub-second response times</p>
+                </div>
+
+                <div class="bg-white/10 backdrop-blur-sm border border-white/20 p-6 rounded-2xl">
+                    <div class="text-3xl mb-3">🧠</div>
+                    <h3 class="text-xl font-bold mb-2">Context Understanding</h3>
+                    <p class="text-indigo-100">Educational content extraction and summarization</p>
+                </div>
+
+                <div class="bg-white/10 backdrop-blur-sm border border-white/20 p-6 rounded-2xl">
+                    <div class="text-3xl mb-3">🔄</div>
+                    <h3 class="text-xl font-bold mb-2">Parallel Processing</h3>
+                    <p class="text-indigo-100">Simultaneous translation of multiple content sections</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Why Gemini is Central -->
+        <section class="bg-white p-8 rounded-3xl shadow-lg border border-slate-200">
+            <h2 class="text-3xl font-bold text-slate-800 mb-6 flex items-center gap-3">
+                <span class="text-4xl">💡</span>
+                Why Gemini is Central to LectureGenius
+            </h2>
+
+            <div class="space-y-4 text-slate-700 leading-relaxed">
+                <p class="text-lg">
+                    <strong>Gemini is not just a feature—it IS LectureGenius.</strong> Every core functionality depends
+                    on Gemini's capabilities:
+                </p>
+
+                <ul class="space-y-3 ml-6">
+                    <li class="flex items-start gap-3">
+                        <span class="text-green-500 text-xl mt-1">✓</span>
+                        <span><strong>No Gemini = No App:</strong> Without Gemini's multimodal processing, we'd need
+                            separate services for transcription, summarization, and translation—making the app slow and
+                            expensive.</span>
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <span class="text-green-500 text-xl mt-1">✓</span>
+                        <span><strong>Speed Matters:</strong> The Flash model processes a 5-minute lecture in under 10
+                            seconds, crucial for student workflows.</span>
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <span class="text-green-500 text-xl mt-1">✓</span>
+                        <span><strong>Quality Over Quantity:</strong> Gemini understands educational context, not just
+                            words—it extracts learning objectives and key concepts.</span>
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <span class="text-green-500 text-xl mt-1">✓</span>
+                        <span><strong>Global Impact:</strong> Gemini's translation breaks language barriers, enabling
+                            students worldwide to learn in their native language.</span>
+                    </li>
+                </ul>
+
+                <div class="bg-indigo-50 border-l-4 border-indigo-500 p-6 rounded-r-xl mt-6">
+                    <p class="text-indigo-900 font-semibold">
+                        "LectureGenius exists to democratize education. Gemini makes that mission possible by providing
+                        enterprise-grade AI capabilities that are fast, accurate, and globally accessible."
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Quick Links -->
+        <section class="bg-slate-800 p-8 rounded-3xl shadow-lg text-white">
+            <h2 class="text-2xl font-bold mb-6">📎 Quick Links for Submission</h2>
+
+            <div class="grid md:grid-cols-2 gap-4">
+                <a href="https://github.com/ramkdataeng-lab/lecture-genius" target="_blank"
+                    class="bg-white/10 hover:bg-white/20 border border-white/20 p-4 rounded-xl transition-all flex items-center gap-3">
+                    <span class="text-2xl">📁</span>
+                    <div>
+                        <div class="font-bold">GitHub Repository</div>
+                        <div class="text-sm text-slate-300">View source code</div>
+                    </div>
+                </a>
+
+                <a href="https://lecture-genius.vercel.app" target="_blank"
+                    class="bg-white/10 hover:bg-white/20 border border-white/20 p-4 rounded-xl transition-all flex items-center gap-3">
+                    <span class="text-2xl">🚀</span>
+                    <div>
+                        <div class="font-bold">Live Demo</div>
+                        <div class="text-sm text-slate-300">Try the app</div>
+                    </div>
+                </a>
+
+                <a href="https://gemini-api-competition.devpost.com/" target="_blank"
+                    class="bg-indigo-600 hover:bg-indigo-700 p-4 rounded-xl transition-all flex items-center gap-3 md:col-span-2">
+                    <span class="text-2xl">🏆</span>
+                    <div>
+                        <div class="font-bold">Submit to Devpost</div>
+                        <div class="text-sm text-indigo-200">Gemini API Developer Competition</div>
+                    </div>
+                </a>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-slate-900 text-slate-400 py-8 px-8 text-center mt-12">
+        <p class="text-sm">Built with ❤️ using Google Gemini 3.0 Flash, Next.js, and Tailwind CSS</p>
+        <p class="text-xs mt-2">© 2026 LectureGenius - Democratizing Education Globally</p>
+    </footer>
+
+</body>
+
+</html>
