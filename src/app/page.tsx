@@ -132,73 +132,36 @@ const DemoShowcase = () => {
 
 const WorkflowVisual = () => {
   return (
-    <div className="relative w-[320px] h-[180px] bg-slate-900/30 backdrop-blur-md border border-white/10 rounded-2xl p-4 hidden xl:block overflow-hidden shadow-inner shrink-0">
-      {/* Title */}
-      <div className="absolute top-2 left-4 text-[10px] font-bold text-white/40 tracking-[0.2em] z-10 uppercase">Live Processing</div>
+    <div className="relative w-[320px] h-[180px] bg-slate-900/5 backdrop-blur-sm border border-white/5 rounded-2xl hidden xl:block overflow-hidden shadow-inner shrink-0 scale-95 origin-right">
+      {/* Background Image - User must provide public/workflow.png */}
+      <div className="absolute inset-0 z-0 flex items-center justify-center opacity-80 mix-blend-screen">
+        <img src="/workflow.png" alt="AI Process Workflow" className="w-full h-full object-contain" />
+      </div>
 
-      {/* SVG Paths & Animations */}
-      <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 320 180" preserveAspectRatio="none" style={{ filter: 'drop-shadow(0 0 2px rgba(255,255,255,0.1))' }}>
-        <defs>
-          <linearGradient id="gradFlow" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor="#6366f1" />
-            <stop offset="100%" stopColor="#06b6d4" />
-          </linearGradient>
-        </defs>
-
+      {/* Overlay SVG Animations - Paths hidden, but dots travel along them */}
+      <svg className="absolute inset-0 w-full h-full pointer-events-none z-10" viewBox="0 0 320 180" preserveAspectRatio="none">
         {/* Path 1: Voice (Left Top) -> AI (Right Top) */}
-        <path d="M 60 45 H 260" stroke="url(#gradFlow)" strokeWidth="1.5" fill="none" strokeDasharray="4,4" className="opacity-30" />
-        <circle r="3" fill="#a5b4fc">
+        <path d="M 60 45 H 260" stroke="transparent" fill="none" />
+        <circle r="3" fill="#a5b4fc" className="drop-shadow-[0_0_8px_rgba(165,180,252,0.8)]">
           <animateMotion dur="2s" repeatCount="indefinite" path="M 60 45 H 260" keyPoints="0;1" keyTimes="0;1" calcMode="linear" />
         </circle>
 
         {/* Path 2: AI (Right Top) -> Cloud (Right Bottom) - Curved Exterior */}
-        <path d="M 280 65 Q 310 90 280 115" stroke="#22d3ee" strokeWidth="1.5" fill="none" strokeDasharray="4,4" className="opacity-30" />
-        <circle r="3" fill="#22d3ee">
+        <path d="M 280 65 Q 310 90 280 115" stroke="transparent" fill="none" />
+        <circle r="3" fill="#22d3ee" className="drop-shadow-[0_0_8px_rgba(34,211,238,0.8)]">
           <animateMotion dur="2.5s" repeatCount="indefinite" begin="1s" path="M 280 65 Q 310 90 280 115" />
         </circle>
 
         {/* Path 3: Trans (Left Bottom) -> Cloud (Right Bottom) */}
-        <path d="M 60 135 H 260" stroke="#f472b6" strokeWidth="1.5" fill="none" strokeDasharray="4,4" className="opacity-30" />
-        <circle r="3" fill="#f472b6">
+        <path d="M 60 135 H 260" stroke="transparent" fill="none" />
+        <circle r="3" fill="#f472b6" className="drop-shadow-[0_0_8px_rgba(244,114,182,0.8)]">
           <animateMotion dur="2s" repeatCount="indefinite" begin="0.8s" path="M 60 135 H 260" />
         </circle>
-
-        {/* Connection: Voice -> Trans (Vertical) - Suggesting processing trigger */}
-        <path d="M 40 65 V 115" stroke="#f472b6" strokeWidth="1" fill="none" strokeDasharray="2,4" className="opacity-10" />
       </svg>
 
-      {/* Nodes */}
-      {/* Top Left: Voice */}
-      <div className="absolute top-4 left-4 flex flex-col items-center group cursor-pointer z-20">
-        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-600 to-violet-600 border border-white/10 flex items-center justify-center shadow-[0_0_15px_rgba(124,58,237,0.3)] group-hover:scale-110 transition-transform duration-300">
-          <Mic className="w-5 h-5 text-white" />
-        </div>
-        <span className="text-[9px] text-indigo-200 mt-1 font-bold tracking-wide">AUDIO</span>
-      </div>
-
-      {/* Top Right: AI */}
-      <div className="absolute top-4 right-4 flex flex-col items-center group cursor-pointer z-20">
-        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-600 to-blue-600 border border-white/10 flex items-center justify-center shadow-[0_0_15px_rgba(8,145,178,0.3)] group-hover:scale-110 transition-transform duration-300 relative overflow-hidden">
-          <div className="absolute inset-0 bg-white/20 animate-pulse"></div>
-          <Brain className="w-5 h-5 text-white relative z-10" />
-        </div>
-        <span className="text-[9px] text-cyan-200 mt-1 font-bold tracking-wide">GEMINI 3</span>
-      </div>
-
-      {/* Bottom Left: Trans */}
-      <div className="absolute bottom-4 left-4 flex flex-col items-center group cursor-pointer z-20">
-        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-pink-500 to-rose-500 border border-white/10 flex items-center justify-center shadow-[0_0_15px_rgba(244,114,182,0.3)] group-hover:scale-110 transition-transform duration-300">
-          <Languages className="w-5 h-5 text-white" />
-        </div>
-        <span className="text-[9px] text-pink-200 mt-1 font-bold tracking-wide">TRANS</span>
-      </div>
-
-      {/* Bottom Right: Storage */}
-      <div className="absolute bottom-4 right-4 flex flex-col items-center group cursor-pointer z-20">
-        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 border border-white/10 flex items-center justify-center shadow-[0_0_15px_rgba(16,185,129,0.3)] group-hover:scale-110 transition-transform duration-300">
-          <FolderOpen className="w-5 h-5 text-white" />
-        </div>
-        <span className="text-[9px] text-emerald-200 mt-1 font-bold tracking-wide">DRIVE</span>
+      {/* Fallback Text if image fails */}
+      <div className="absolute inset-0 -z-10 flex items-center justify-center text-xs text-white/20 font-mono">
+        Waiting for workflow.png...
       </div>
     </div>
   );
