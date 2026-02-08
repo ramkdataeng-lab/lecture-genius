@@ -40,8 +40,8 @@ async function generateWithRetry(model: any, promptParts: any[], retries = 3): P
 }
 
 export async function generateLectureNotes(fileUri: string, mimeType: string, spokenLanguage: string = "English", targetLanguage: string = "English") {
-    // Using gemini-1.5-flash for maximum stability during judging
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    // Using gemini-2.0-flash as it is available and stable for this account
+    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
     const prompt = `
     You are an expert academic assistant. Process this audio recording of a lecture.
@@ -71,7 +71,7 @@ export async function generateLectureNotes(fileUri: string, mimeType: string, sp
 }
 
 export async function translateContent(text: string, targetLanguage: string) {
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
     const prompt = `
     Task: Translate the following text into ${targetLanguage}.
     Constraint: Return ONLY the translated text. Do not include any introductory or concluding remarks. Do not include the original text. Maintain the original formatting (markdown, newlines, etc.).
@@ -84,7 +84,7 @@ export async function translateContent(text: string, targetLanguage: string) {
 }
 
 export async function translateJsonObject(jsonObj: any, targetLanguage: string) {
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash", generationConfig: { responseMimeType: "application/json" } });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash", generationConfig: { responseMimeType: "application/json" } });
     const prompt = `
     Task: Translate the *values* of the following JSON object into ${targetLanguage}.
     Constraint: Keep all keys in English. Return ONLY the JSON object. Do not translate keys.
