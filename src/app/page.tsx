@@ -220,11 +220,6 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Gemini 3 Demo Showcase - NEW SECTION */}
-        <div id="demo-section" className="mb-10">
-          <DemoShowcase />
-        </div>
-
         {/* Quick Actions Grid */}
         <div className="mb-10">
           <h2 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4 px-1">Actions</h2>
@@ -272,63 +267,73 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Recent Recordings */}
-        <div id="recent-activity" className="scroll-mt-10">
-          <h2 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4 px-1">Recent Activity</h2>
+        {/* Layout Grid: Recent Activity & Demo */}
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
 
-          {loadingActivity ? (
-            <div className="bg-white p-8 rounded-2xl border border-slate-100 shadow-sm text-center">
-              <div className="animate-spin w-8 h-8 border-4 border-indigo-200 border-t-indigo-600 rounded-full mx-auto mb-4"></div>
-              <p className="text-sm text-slate-400">Loading your recent notes...</p>
-            </div>
-          ) : recentActivity.length > 0 ? (
-            <div className="grid grid-cols-1 gap-4">
-              {recentActivity.map((file) => (
-                <div key={file.id} className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all flex flex-col md:flex-row gap-6 md:items-start group">
-                  <div className="bg-indigo-50 w-16 h-16 rounded-xl flex items-center justify-center shrink-0">
-                    <FileText className="w-8 h-8 text-indigo-600" />
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex justify-between items-start">
-                      <h3 className="font-bold text-slate-800 text-lg mb-1 group-hover:text-indigo-600 transition-colors">
-                        {file.name.replace('_Notes.json', '')}
-                      </h3>
-                      <span className="text-xs font-semibold text-slate-400 bg-slate-100 px-2 py-1 rounded">
-                        {new Date(file.createdTime).toLocaleDateString()}
-                      </span>
-                    </div>
+          {/* Left Col: Recent Activity */}
+          <div className="xl:col-span-2" id="recent-activity">
+            <h2 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4 px-1">Recent Activity</h2>
 
-                    <p className="text-sm text-slate-500 leading-relaxed mb-4 line-clamp-2">
-                      {file.description || "No summary available."}
-                    </p>
-
-                    <div className="flex items-center gap-4">
-                      <Link
-                        href={file.webViewLink}
-                        target="_blank"
-                        className="text-sm font-bold text-indigo-600 hover:text-indigo-800 flex items-center gap-1"
-                      >
-                        <ExternalLink className="w-4 h-4" /> Open in Drive
-                      </Link>
-                      <button
-                        onClick={() => window.open(file.parents?.[0] ? `https://drive.google.com/drive/folders/${file.parents[0]}` : file.webViewLink, '_blank')}
-                        className="text-sm font-bold text-slate-500 hover:text-slate-700 flex items-center gap-1"
-                      >
-                        <FolderOpen className="w-4 h-4" /> Open Folder
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="bg-white p-2 rounded-2xl border border-slate-100 shadow-sm space-y-1">
-              <div className="p-8 text-center text-slate-400 flex flex-col items-center">
-                <Mic className="w-12 h-12 text-slate-200 mb-4" />
-                <p className="text-sm font-medium">Your recent recordings will appear here once processed.</p>
+            {loadingActivity ? (
+              <div className="bg-white p-8 rounded-2xl border border-slate-100 shadow-sm text-center">
+                <div className="animate-spin w-8 h-8 border-4 border-indigo-200 border-t-indigo-600 rounded-full mx-auto mb-4"></div>
+                <p className="text-sm text-slate-400">Loading your recent notes...</p>
               </div>
-            </div>
-          )}
+            ) : recentActivity.length > 0 ? (
+              <div className="grid grid-cols-1 gap-4">
+                {recentActivity.map((file) => (
+                  <div key={file.id} className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all flex flex-col md:flex-row gap-6 md:items-start group">
+                    <div className="bg-indigo-50 w-16 h-16 rounded-xl flex items-center justify-center shrink-0">
+                      <FileText className="w-8 h-8 text-indigo-600" />
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex justify-between items-start">
+                        <h3 className="font-bold text-slate-800 text-lg mb-1 group-hover:text-indigo-600 transition-colors">
+                          {file.name.replace('_Notes.json', '')}
+                        </h3>
+                        <span className="text-xs font-semibold text-slate-400 bg-slate-100 px-2 py-1 rounded">
+                          {new Date(file.createdTime).toLocaleDateString()}
+                        </span>
+                      </div>
+
+                      <p className="text-sm text-slate-500 leading-relaxed mb-4 line-clamp-2">
+                        {file.description || "No summary available."}
+                      </p>
+
+                      <div className="flex items-center gap-4">
+                        <Link
+                          href={file.webViewLink}
+                          target="_blank"
+                          className="text-sm font-bold text-indigo-600 hover:text-indigo-800 flex items-center gap-1"
+                        >
+                          <ExternalLink className="w-4 h-4" /> Open in Drive
+                        </Link>
+                        <button
+                          onClick={() => window.open(file.parents?.[0] ? `https://drive.google.com/drive/folders/${file.parents[0]}` : file.webViewLink, '_blank')}
+                          className="text-sm font-bold text-slate-500 hover:text-slate-700 flex items-center gap-1"
+                        >
+                          <FolderOpen className="w-4 h-4" /> Open Folder
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="bg-white p-2 rounded-2xl border border-slate-100 shadow-sm space-y-1">
+                <div className="p-8 text-center text-slate-400 flex flex-col items-center">
+                  <Mic className="w-12 h-12 text-slate-200 mb-4" />
+                  <p className="text-sm font-medium">Your recent recordings will appear here once processed.</p>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Right Col: Demo Showcase (Sticky?) */}
+          <div className="xl:col-span-1">
+            <DemoShowcase />
+          </div>
+
         </div>
 
       </main>
