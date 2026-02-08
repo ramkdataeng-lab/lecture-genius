@@ -208,7 +208,7 @@ This project was built for the **Gemini API Developer Competition** on Devpost.
 
 - **Live Demo**: [https://lecture-genius.vercel.app](https://lecture-genius.vercel.app)
 - **Devpost**: [Coming Soon]
-- **Demo Video**: [Coming Soon]
+- **Demo Video**: [Watch on YouTube](https://www.youtube.com/watch?v=YoZxvtz7gfQ)
 
 ---
 
