@@ -21,22 +21,22 @@ Add each of the following as a **new environment variable**:
 
 #### NEXTAUTH_SECRET
 - **Key**: `NEXTAUTH_SECRET`
-- **Value**: `3INIgsXaj+OUKLyGM7/LidTS6uYfYUoLy8UziB2f/uE=`
+- **Value**: `[Get from your .env.local file - DO NOT commit this]`
 - **Environment**: Production, Preview, Development (check all)
 
 #### GOOGLE_CLIENT_ID
 - **Key**: `GOOGLE_CLIENT_ID`
-- **Value**: `23402038626-jt18u51bcjc9vhmtr973p2hajs3ail8u.apps.googleusercontent.com`
+- **Value**: `[Get from Google Cloud Console - DO NOT commit this]`
 - **Environment**: Production, Preview, Development (check all)
 
 #### GOOGLE_CLIENT_SECRET
 - **Key**: `GOOGLE_CLIENT_SECRET`
-- **Value**: `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`
+- **Value**: `[Get from Google Cloud Console - DO NOT commit this]`
 - **Environment**: Production, Preview, Development (check all)
 
 #### GEMINI_API_KEY
 - **Key**: `GEMINI_API_KEY`
-- **Value**: `AIzaSyArpxXJooQPthsi5c6yRRPinxOufN1O-Io`
+- **Value**: `[Get from Google AI Studio - DO NOT commit this]`
 - **Environment**: Production, Preview, Development (check all)
 
 ### Step 3: Update Google OAuth Redirect URIs
