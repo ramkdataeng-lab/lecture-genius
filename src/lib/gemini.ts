@@ -25,19 +25,23 @@ async function generateWithRetry(model: any, promptParts: any[], retries = 3): P
         try {
             return await model.generateContent(promptParts);
         } catch (error: any) {
-            if (error.status === 429 || error.message?.includes("429") || error.message?.includes("Quota exceeded")) {
-                console.warn(`Gemini Rate Limit hit. Retrying in ${(i + 1) * 2000}ms...`);
-                await delay((i + 1) * 2000); // Wait 2s, 4s, 6s
+            // Handle 429 (Too Many Requests) and 503 (Service Unavailable/Overloaded)
+            if (error.status === 429 || error.status === 503 ||
+                error.message?.includes("429") || error.message?.includes("503") ||
+                error.message?.includes("Quota exceeded") || error.message?.includes("overloaded")) {
+                console.warn(`Gemini API Busy/Rate Limit (Attempt ${i + 1}/${retries}). Retrying in ${(i + 1) * 2000}ms...`);
+                await delay((i + 1) * 2000); // Backoff: 2s, 4s, 6s
                 continue;
             }
             throw error;
         }
     }
-    throw new Error("Gemini API Rate Limit Exceeded after retries. Please try again later.");
+    throw new Error("Gemini API Request Failed after multiple retries. The model might be overloaded.");
 }
 
 export async function generateLectureNotes(fileUri: string, mimeType: string, spokenLanguage: string = "English", targetLanguage: string = "English") {
-    const model = genAI.getGenerativeModel({ model: "gemini-3-flash-preview" });
+    // Using gemini-1.5-flash for maximum stability during judging
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
     const prompt = `
     You are an expert academic assistant. Process this audio recording of a lecture.
@@ -67,7 +71,7 @@ export async function generateLectureNotes(fileUri: string, mimeType: string, sp
 }
 
 export async function translateContent(text: string, targetLanguage: string) {
-    const model = genAI.getGenerativeModel({ model: "gemini-3-flash-preview" });
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
     const prompt = `
     Task: Translate the following text into ${targetLanguage}.
     Constraint: Return ONLY the translated text. Do not include any introductory or concluding remarks. Do not include the original text. Maintain the original formatting (markdown, newlines, etc.).
@@ -80,7 +84,7 @@ export async function translateContent(text: string, targetLanguage: string) {
 }
 
 export async function translateJsonObject(jsonObj: any, targetLanguage: string) {
-    const model = genAI.getGenerativeModel({ model: "gemini-3-flash-preview", generationConfig: { responseMimeType: "application/json" } });
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash", generationConfig: { responseMimeType: "application/json" } });
     const prompt = `
     Task: Translate the *values* of the following JSON object into ${targetLanguage}.
     Constraint: Keep all keys in English. Return ONLY the JSON object. Do not translate keys.
