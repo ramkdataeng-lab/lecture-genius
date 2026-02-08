@@ -7,6 +7,113 @@ import Image from "next/image";
 import { Mic, FolderOpen, Brain, PlayCircle, FileText, ExternalLink } from "lucide-react";
 import { useState, useEffect } from "react";
 
+const DEMO_DATA = {
+  title: "Lecture: The Future of Renewable Energy",
+  summary: "This lecture explores next-generation solar technologies and the efficiency limits of photovoltaic cells. Prof. Hamilton explains how perovskite materials could double current efficiency rates by 2030, reducing global carbon emissions significantly.",
+  translation: "Esta conferencia explora las tecnologías solares de próxima generación y los límites de eficiencia de las células fotovoltaicas. El profesor Hamilton explica cómo los materiales de perovskita podrían duplicar las tasas de eficiencia actuales para 2030.",
+  key_points: [
+    "Perovskite cells offer higher efficiency than silicon.",
+    "Manufacturing costs are projected to drop by 40%.",
+    "Grid integration remains the primary infrastructure challenge."
+  ],
+  quiz: {
+    question: "According to the lecture, what is the key advantage of Perovskite materials?",
+    options: ["Lower manufacturing costs", "Higher efficiency potential", "Higher durability"],
+    answer: "Higher efficiency potential"
+  }
+};
+
+const DemoShowcase = () => {
+  const [activeTab, setActiveTab] = useState<'summary' | 'translation' | 'points' | 'quiz'>('summary');
+  const [isOpen, setIsOpen] = useState(false);
+
+  if (!isOpen) {
+    return (
+      <div className="bg-white rounded-2xl border border-slate-200 p-8 text-center shadow-sm relative overflow-hidden group hover:shadow-md transition-shadow">
+        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 to-purple-600"></div>
+        <h2 className="text-2xl font-bold text-slate-800 mb-2">See Gemini 3 in Action</h2>
+        <p className="text-slate-500 mb-6 max-w-lg mx-auto">
+          Experience how our multimodal AI processes lectures into structured notes, translations, and interactive quizzes instantly.
+        </p>
+        <button
+          onClick={() => setIsOpen(true)}
+          className="bg-slate-900 text-white px-8 py-3 rounded-xl font-bold hover:scale-105 transition-transform shadow-lg flex items-center gap-2 mx-auto"
+        >
+          <PlayCircle className="w-5 h-5 text-cyan-400" /> Load Demo Lecture
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="bg-white rounded-2xl border border-blue-100 shadow-xl overflow-hidden ring-4 ring-blue-50/50 transition-all">
+      {/* Header of Demo */}
+      <div className="bg-slate-900 text-white p-6 flex justify-between items-start">
+        <div>
+          <div className="flex items-center gap-2 mb-1">
+            <span className="bg-cyan-500/20 text-cyan-300 text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider">Gemini 3 Processed</span>
+            <span className="text-slate-400 text-xs">• 5m 30s Audio</span>
+          </div>
+          <h3 className="text-xl font-bold">Lecture: The Future of Renewable Energy</h3>
+        </div>
+        <button onClick={() => setIsOpen(false)} className="text-slate-400 hover:text-white">✕</button>
+      </div>
+
+      {/* Content Tabs */}
+      <div className="flex border-b border-slate-100 overflow-x-auto">
+        <button onClick={() => setActiveTab('summary')} className={`flex-1 py-3 text-sm font-bold border-b-2 transition-colors px-4 whitespace-nowrap ${activeTab === 'summary' ? 'border-blue-500 text-blue-600' : 'border-transparent text-slate-500 hover:text-slate-700'}`}>Summary</button>
+        <button onClick={() => setActiveTab('points')} className={`flex-1 py-3 text-sm font-bold border-b-2 transition-colors px-4 whitespace-nowrap ${activeTab === 'points' ? 'border-purple-500 text-purple-600' : 'border-transparent text-slate-500 hover:text-slate-700'}`}>Key Points</button>
+        <button onClick={() => setActiveTab('translation')} className={`flex-1 py-3 text-sm font-bold border-b-2 transition-colors px-4 whitespace-nowrap ${activeTab === 'translation' ? 'border-green-500 text-green-600' : 'border-transparent text-slate-500 hover:text-slate-700'}`}>Translation (ES)</button>
+        <button onClick={() => setActiveTab('quiz')} className={`flex-1 py-3 text-sm font-bold border-b-2 transition-colors px-4 whitespace-nowrap ${activeTab === 'quiz' ? 'border-pink-500 text-pink-600' : 'border-transparent text-slate-500 hover:text-slate-700'}`}>AI Quiz</button>
+      </div>
+
+      {/* Body */}
+      <div className="p-6 bg-slate-50 min-h-[200px]">
+        {activeTab === 'summary' && (
+          <div className="animate-in fade-in duration-300">
+            <p className="text-slate-700 leading-relaxed text-lg">{DEMO_DATA.summary}</p>
+          </div>
+        )}
+        {activeTab === 'points' && (
+          <ul className="space-y-3 animate-in fade-in duration-300">
+            {DEMO_DATA.key_points.map((p, i) => (
+              <li key={i} className="flex gap-3 items-start">
+                <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-purple-500 shrink-0" />
+                <span className="text-slate-700 font-medium">{p}</span>
+              </li>
+            ))}
+          </ul>
+        )}
+        {activeTab === 'translation' && (
+          <div className="animate-in fade-in duration-300">
+            <p className="text-slate-700 leading-relaxed text-lg font-serif italic text-slate-600">{DEMO_DATA.translation}</p>
+          </div>
+        )}
+        {activeTab === 'quiz' && (
+          <div className="animate-in fade-in duration-300">
+            <h4 className="font-bold text-slate-800 mb-4 text-lg">Question 1:</h4>
+            <p className="text-slate-700 mb-6 font-medium">{DEMO_DATA.quiz.question}</p>
+            <div className="space-y-3">
+              {DEMO_DATA.quiz.options.map((opt, i) => (
+                <button key={i} className={`w-full text-left p-4 rounded-xl border transition-all ${opt === DEMO_DATA.quiz.answer ? 'bg-green-50 border-green-200 text-green-800 font-bold' : 'bg-white border-slate-200 hover:bg-slate-50'}`}>
+                  {String.fromCharCode(65 + i)}. {opt}
+                  {opt === DEMO_DATA.quiz.answer && <span className="float-right text-green-600">✓ Correct</span>}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+
+      <div className="bg-blue-50 p-3 text-center">
+        <p className="text-xs text-blue-600 font-medium flex items-center justify-center gap-1">
+          <Brain className="w-3 h-3" /> Analysis generated by Gemini 3 Flash • 1.2s latency
+        </p>
+      </div>
+    </div>
+  );
+};
+
 export default function Home() {
   const { data: session, status } = useSession();
   const [recentActivity, setRecentActivity] = useState<any[]>([]);
@@ -76,14 +183,15 @@ export default function Home() {
               <div className="flex items-center gap-3 mb-4 opacity-90">
                 <Brain className="w-10 h-10 text-cyan-300 drop-shadow-md" />
                 <span className="text-xl md:text-2xl font-bold tracking-tight text-white leading-tight">
-                  Democratizing Education Globally <span className="text-cyan-300">with AI</span>
+                  Democratizing Education Globally <span className="text-cyan-300">with Gemini 3</span>
                 </span>
+                <span className="bg-white/20 text-xs font-bold px-2 py-1 rounded-full border border-white/20 ml-2">Powered by Gemini 3</span>
               </div>
 
               <h1 className="text-3xl md:text-5xl font-bold mb-4 tracking-tight">Hello, {userName}!</h1>
 
               <p className="text-indigo-100 text-lg mb-8 leading-relaxed font-medium opacity-90">
-                Ready to capture your next lecture? I can transcribe, summarize, and translate seamlessly.
+                Ready to capture your next lecture? I can transcribe, summarize, and translate seamlessly using Google's most advanced AI.
               </p>
 
               <div className="flex flex-wrap gap-4 items-center">
@@ -110,6 +218,11 @@ export default function Home() {
             <div className="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
             <div className="absolute bottom-0 left-0 w-64 h-64 bg-indigo-900/20 rounded-full blur-2xl translate-y-1/3 -translate-x-1/3 pointer-events-none"></div>
           </div>
+        </div>
+
+        {/* Gemini 3 Demo Showcase - NEW SECTION */}
+        <div id="demo-section" className="mb-10">
+          <DemoShowcase />
         </div>
 
         {/* Quick Actions Grid */}
