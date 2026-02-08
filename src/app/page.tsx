@@ -7,15 +7,16 @@ import Image from "next/image";
 import { Mic, FolderOpen, Brain, PlayCircle, FileText, ExternalLink } from "lucide-react";
 import { useState, useEffect } from "react";
 
-// Gemini Icon with HIGH CONTRAST (White/Cyan) for dark background
+// Gemini Icon using Official Google Colors gradient
 const GeminiIcon = ({ className }: { className?: string }) => (
   <svg viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
-    <path d="M256 0c0 0-30 140-140 140S0 256 0 256s140 0 140 140 30 116 30 116 0-110 30-116 172-24 172-24-142 0-172-140S256 0 256 0z" fill="url(#g1)" />
-    <path d="M400 60c0 0-20 60-60 60s-60 60-60 60 60 0 60 60 20 60 20 60 0-60 20-60 60-20 60-20-40 0-60-60S400 60 400 60z" fill="url(#g1)" />
+    <path d="M256 0c0 0-30 140-140 140S0 256 0 256s140 0 140 140 30 116 30 116 0-110 30-116 172-24 172-24-142 0-172-140S256 0 256 0z" fill="url(#gemini-gradient)" />
     <defs>
-      <linearGradient id="g1" x1="0" y1="0" x2="512" y2="512" gradientUnits="userSpaceOnUse">
-        <stop offset="0" stopColor="#FFFFFF" />
-        <stop offset="1" stopColor="#06b6d4" />
+      <linearGradient id="gemini-gradient" x1="0" y1="0" x2="512" y2="512" gradientUnits="userSpaceOnUse">
+        <stop offset="0" stopColor="#4285F4" />
+        <stop offset="0.33" stopColor="#DB4437" />
+        <stop offset="0.66" stopColor="#F4B400" />
+        <stop offset="1" stopColor="#0F9D58" />
       </linearGradient>
     </defs>
   </svg>
@@ -171,7 +172,7 @@ export default function Home() {
     <div className="bg-slate-50 min-h-screen flex font-sans">
       <Sidebar />
 
-      <main className="flex-1 md:ml-64 p-8 overflow-y-auto">
+      <main className="flex-1 md:ml-64 p-6 overflow-y-auto">
 
         {/* 1. Header Section */}
         <div className="mb-8">
@@ -220,9 +221,9 @@ export default function Home() {
               </div>
 
               {/* Right: Badge (Extreme Right) */}
-              <div className="flex items-center gap-3 bg-slate-900/40 backdrop-blur-md px-5 py-3 rounded-full border border-white/20 shadow-2xl hover:scale-105 transition-transform cursor-default shrink-0 self-start mt-2 md:mt-0">
-                <GeminiIcon className="w-8 h-8 animate-pulse drop-shadow-[0_0_10px_rgba(255,255,255,0.5)]" />
-                <span className="text-lg font-bold tracking-wide text-white drop-shadow-md whitespace-nowrap">POWERED BY GEMINI 3</span>
+              <div className="flex items-center gap-3 bg-white px-5 py-3 rounded-full shadow-2xl hover:scale-105 transition-transform cursor-default shrink-0 self-start mt-2 md:mt-0 border border-slate-200">
+                <GeminiIcon className="w-8 h-8 drop-shadow-sm" />
+                <span className="text-lg font-bold tracking-wide text-slate-900 whitespace-nowrap">POWERED BY GEMINI 3</span>
               </div>
             </div>
 
