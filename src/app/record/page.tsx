@@ -388,138 +388,133 @@ ${notes.detailed_notes}
                                     </div>
                                 </>
                             )}
-                            {
-                                recordingState === "recording" && (
-                                    <>
-                                        <div className="text-9xl font-mono text-slate-900 font-bold mb-8 tracking-tighter tabular-nums relative z-10 transition-all">
-                                            {formatTime(timer)}
-                                        </div>
 
-                                        {/* Audio Visualizer */}
-                                        <canvas
-                                            ref={canvasRef}
-                                            width={300}
-                                            height={100}
-                                            className="w-full max-w-sm h-32 mb-8 rounded-xl bg-slate-50 border border-slate-100 shadow-inner"
-                                        />
+                            {recordingState === "recording" && (
+                                <>
+                                    <div className="text-9xl font-mono text-slate-900 font-bold mb-8 tracking-tighter tabular-nums relative z-10 transition-all">
+                                        {formatTime(timer)}
+                                    </div>
 
-                                        {/* Live Captions Preview */}
-                                        <div className="h-24 w-full max-w-lg mb-8 text-center px-4 overflow-hidden relative">
-                                            <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-white via-transparent to-transparent z-10"></div>
-                                            <p className="text-xl font-medium text-slate-600 transition-all animate-in fade-in slide-in-from-bottom-2 duration-300">
-                                                "{captions || "Listening..."}"
-                                            </p>
-                                        </div>
+                                    {/* Audio Visualizer */}
+                                    <canvas
+                                        ref={canvasRef}
+                                        width={300}
+                                        height={100}
+                                        className="w-full max-w-sm h-32 mb-8 rounded-xl bg-slate-50 border border-slate-100 shadow-inner"
+                                    />
 
-                                        <div className="flex items-center gap-8 relative z-10">
-                                            <button
-                                                onClick={stopRecording}
-                                                className="w-24 h-24 rounded-full bg-white border-4 border-red-100 flex items-center justify-center shadow-lg hover:bg-red-50 active:scale-95 transition-all group"
-                                            >
-                                                <Square className="w-8 h-8 text-red-500 fill-red-500 rounded" />
-                                            </button>
-                                        </div>
-                                        <p className="mt-8 text-slate-400 font-medium animate-pulse flex items-center gap-2">
-                                            <span className="w-2 h-2 rounded-full bg-red-500"></span> Recording active...
+                                    {/* Live Captions Preview */}
+                                    <div className="h-24 w-full max-w-lg mb-8 text-center px-4 overflow-hidden relative">
+                                        <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-white via-transparent to-transparent z-10"></div>
+                                        <p className="text-xl font-medium text-slate-600 transition-all animate-in fade-in slide-in-from-bottom-2 duration-300">
+                                            "{captions || "Listening..."}"
                                         </p>
-                                    </>
-                                )
-                            }
+                                    </div>
 
-                            {
-                                recordingState === "processing" && (
-                                    <div className="flex flex-col items-center justify-center space-y-6">
-                                        <div className="relative">
-                                            <div className="absolute inset-0 bg-indigo-500 rounded-full blur-xl opacity-20 animate-ping"></div>
-                                            <Loader2 className="w-16 h-16 text-indigo-600 animate-spin relative z-10" />
-                                        </div>
-                                        <div className="text-center space-y-2">
-                                            <h2 className="text-2xl font-bold text-slate-800">Processing Lecture</h2>
-                                            <p className="text-slate-500 max-w-xs">Gemini AI is transcribing and summarizing your audio...</p>
+                                    <div className="flex items-center gap-8 relative z-10">
+                                        <button
+                                            onClick={stopRecording}
+                                            className="w-24 h-24 rounded-full bg-white border-4 border-red-100 flex items-center justify-center shadow-lg hover:bg-red-50 active:scale-95 transition-all group"
+                                        >
+                                            <Square className="w-8 h-8 text-red-500 fill-red-500 rounded" />
+                                        </button>
+                                    </div>
+                                    <p className="mt-8 text-slate-400 font-medium animate-pulse flex items-center gap-2">
+                                        <span className="w-2 h-2 rounded-full bg-red-500"></span> Recording active...
+                                    </p>
+                                </>
+                            )}
+
+                            {recordingState === "processing" && (
+                                <div className="flex flex-col items-center justify-center space-y-6">
+                                    <div className="relative">
+                                        <div className="absolute inset-0 bg-indigo-500 rounded-full blur-xl opacity-20 animate-ping"></div>
+                                        <Loader2 className="w-16 h-16 text-indigo-600 animate-spin relative z-10" />
+                                    </div>
+                                    <div className="text-center space-y-2">
+                                        <h2 className="text-2xl font-bold text-slate-800">Processing Lecture</h2>
+                                        <p className="text-slate-500 max-w-xs">Gemini AI is transcribing and summarizing your audio...</p>
+                                    </div>
+                                </div>
+                            )}
+
+                            {recordingState === "completed" && result && (
+                                <div className="w-full animate-in fade-in zoom-in duration-300 text-left">
+                                    <div className="flex items-center justify-center mb-6">
+                                        <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center">
+                                            <FileCheck className="w-8 h-8 text-emerald-600" />
                                         </div>
                                     </div>
-                                )
-                            }
+                                    <h2 className="text-3xl font-bold text-slate-900 text-center mb-2">Lecture Processed!</h2>
+                                    <p className="text-slate-500 text-center mb-8 text-sm">Saved to Google Drive automatically.</p>
 
-                            {
-                                recordingState === "completed" && result && (
-                                    <div className="w-full animate-in fade-in zoom-in duration-300 text-left">
-                                        <div className="flex items-center justify-center mb-6">
-                                            <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center">
-                                                <FileCheck className="w-8 h-8 text-emerald-600" />
-                                            </div>
-                                        </div>
-                                        <h2 className="text-3xl font-bold text-slate-900 text-center mb-2">Lecture Processed!</h2>
-                                        <p className="text-slate-500 text-center mb-8 text-sm">Saved to Google Drive automatically.</p>
-
-                                        {/* Actions Row: Share & Drive */}
-                                        <div className="flex justify-center gap-3 mb-8">
-                                            <button onClick={() => handleShare('whatsapp')} className="p-2.5 bg-green-50 text-green-600 rounded-xl hover:bg-green-100 transition-colors border border-green-200">
-                                                <MessageCircle className="w-5 h-5" />
-                                            </button>
-                                            <button onClick={() => handleShare('email')} className="p-2.5 bg-blue-50 text-blue-600 rounded-xl hover:bg-blue-100 transition-colors border border-blue-200">
-                                                <Mail className="w-5 h-5" />
-                                            </button>
-                                            <a href={result.driveAudio?.webViewLink} target="_blank" className="px-5 py-2.5 bg-white text-indigo-600 border border-indigo-100 rounded-xl font-bold hover:bg-indigo-50 transition-colors flex items-center gap-2 text-sm">
-                                                Drive <Share2 className="w-4 h-4" />
-                                            </a>
-                                        </div>
-
-                                        {/* Summary View */}
-                                        <div className="bg-slate-50 rounded-2xl p-6 border border-slate-100 mb-6 max-h-[300px] overflow-y-auto shadow-inner prose prose-slate prose-sm max-w-none">
-                                            <ReactMarkdown>
-                                                {typeof result.notes === 'string' ? JSON.parse(result.notes).summary || result.notes : result.notes.summary}
-                                            </ReactMarkdown>
-                                        </div>
-
-                                        {/* Translation Section */}
-                                        <div className="bg-slate-50/80 rounded-3xl p-8 mb-8">
-                                            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-6">
-                                                <div className="flex items-center gap-3 text-slate-800 text-lg font-bold">
-                                                    <div className="w-10 h-10 rounded-xl bg-white border border-slate-100 flex items-center justify-center shadow-sm text-indigo-500">
-                                                        <Globe className="w-5 h-5" />
-                                                    </div>
-                                                    Translate Notes
-                                                </div>
-                                                <div className="flex gap-3 w-full md:w-auto">
-                                                    <select
-                                                        className="flex-1 md:w-48 bg-white border border-slate-200 text-slate-700 text-base rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-indigo-500 transition-all cursor-pointer hover:border-slate-300 shadow-sm"
-                                                        value={targetLang}
-                                                        onChange={(e) => setTargetLang(e.target.value)}
-                                                    >
-                                                        {LANGUAGES.map(lang => <option key={lang} value={lang}>{lang}</option>)}
-                                                    </select>
-                                                    <button
-                                                        onClick={handleTranslate}
-                                                        disabled={isTranslating}
-                                                        className="px-8 py-3 bg-indigo-600 text-white text-base font-bold rounded-xl hover:bg-indigo-700 transition-all shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed min-w-[120px]"
-                                                    >
-                                                        {isTranslating ? '...' : 'Translate'}
-                                                    </button>
-                                                </div>
-                                            </div>
-
-                                            {/* Translated Content Display */}
-                                            {translatedContent && (
-                                                <div className="bg-white border border-slate-200 rounded-2xl p-8 text-base text-slate-700 animate-in fade-in zoom-in-95 duration-300 h-[500px] overflow-y-auto prose prose-blue prose-lg max-w-none break-words shadow-sm custom-scrollbar">
-                                                    <ReactMarkdown>
-                                                        {translatedContent}
-                                                    </ReactMarkdown>
-                                                </div>
-                                            )}
-                                        </div>
-
-                                        <div className="flex justify-center">
-                                            <button onClick={() => window.location.reload()} className="w-full py-4 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-200">
-                                                Start New Recording
-                                            </button>
-                                        </div>
+                                    {/* Actions Row: Share & Drive */}
+                                    <div className="flex justify-center gap-3 mb-8">
+                                        <button onClick={() => handleShare('whatsapp')} className="p-2.5 bg-green-50 text-green-600 rounded-xl hover:bg-green-100 transition-colors border border-green-200">
+                                            <MessageCircle className="w-5 h-5" />
+                                        </button>
+                                        <button onClick={() => handleShare('email')} className="p-2.5 bg-blue-50 text-blue-600 rounded-xl hover:bg-blue-100 transition-colors border border-blue-200">
+                                            <Mail className="w-5 h-5" />
+                                        </button>
+                                        <a href={result.driveAudio?.webViewLink} target="_blank" className="px-5 py-2.5 bg-white text-indigo-600 border border-indigo-100 rounded-xl font-bold hover:bg-indigo-50 transition-colors flex items-center gap-2 text-sm">
+                                            Drive <Share2 className="w-4 h-4" />
+                                        </a>
                                     </div>
-                                )
-                            }
 
-                        </div >
-                    </div >
+                                    {/* Summary View */}
+                                    <div className="bg-slate-50 rounded-2xl p-6 border border-slate-100 mb-6 max-h-[300px] overflow-y-auto shadow-inner prose prose-slate prose-sm max-w-none">
+                                        <ReactMarkdown>
+                                            {typeof result.notes === 'string' ? JSON.parse(result.notes).summary || result.notes : result.notes.summary}
+                                        </ReactMarkdown>
+                                    </div>
+
+                                    {/* Translation Section */}
+                                    <div className="bg-slate-50/80 rounded-3xl p-8 mb-8">
+                                        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-6">
+                                            <div className="flex items-center gap-3 text-slate-800 text-lg font-bold">
+                                                <div className="w-10 h-10 rounded-xl bg-white border border-slate-100 flex items-center justify-center shadow-sm text-indigo-500">
+                                                    <Globe className="w-5 h-5" />
+                                                </div>
+                                                Translate Notes
+                                            </div>
+                                            <div className="flex gap-3 w-full md:w-auto">
+                                                <select
+                                                    className="flex-1 md:w-48 bg-white border border-slate-200 text-slate-700 text-base rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-indigo-500 transition-all cursor-pointer hover:border-slate-300 shadow-sm"
+                                                    value={targetLang}
+                                                    onChange={(e) => setTargetLang(e.target.value)}
+                                                >
+                                                    {LANGUAGES.map(lang => <option key={lang} value={lang}>{lang}</option>)}
+                                                </select>
+                                                <button
+                                                    onClick={handleTranslate}
+                                                    disabled={isTranslating}
+                                                    className="px-8 py-3 bg-indigo-600 text-white text-base font-bold rounded-xl hover:bg-indigo-700 transition-all shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed min-w-[120px]"
+                                                >
+                                                    {isTranslating ? '...' : 'Translate'}
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        {/* Translated Content Display */}
+                                        {translatedContent && (
+                                            <div className="bg-white border border-slate-200 rounded-2xl p-8 text-base text-slate-700 animate-in fade-in zoom-in-95 duration-300 h-[500px] overflow-y-auto prose prose-blue prose-lg max-w-none break-words shadow-sm custom-scrollbar">
+                                                <ReactMarkdown>
+                                                    {translatedContent}
+                                                </ReactMarkdown>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    <div className="flex justify-center">
+                                        <button onClick={() => window.location.reload()} className="w-full py-4 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-200">
+                                            Start New Recording
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
+
+                        </div>
+                    </div>
                 </div >
 
             </main >
