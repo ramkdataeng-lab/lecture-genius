@@ -7,6 +7,19 @@ import Image from "next/image";
 import { Mic, FolderOpen, Brain, PlayCircle, FileText, ExternalLink } from "lucide-react";
 import { useState, useEffect } from "react";
 
+const GeminiIcon = ({ className }: { className?: string }) => (
+  <svg viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+    <path d="M256 0c0 0-30 140-140 140S0 256 0 256s140 0 140 140 30 116 30 116 0-110 30-116 172-24 172-24-142 0-172-140S256 0 256 0z" fill="url(#g1)" />
+    <path d="M400 60c0 0-20 60-60 60s-60 60-60 60 60 0 60 60 20 60 20 60 0-60 20-60 60-20 60-20-40 0-60-60S400 60 400 60z" fill="url(#g1)" />
+    <defs>
+      <linearGradient id="g1" x1="0" y1="0" x2="512" y2="512" gradientUnits="userSpaceOnUse">
+        <stop offset="0" stopColor="#4aa2f2" />
+        <stop offset="1" stopColor="#a55eea" />
+      </linearGradient>
+    </defs>
+  </svg>
+);
+
 const DEMO_DATA = {
   title: "Lecture: The Future of Renewable Energy",
   summary: "This lecture explores next-generation solar technologies and the efficiency limits of photovoltaic cells. Prof. Hamilton explains how perovskite materials could double current efficiency rates by 2030, reducing global carbon emissions significantly.",
@@ -29,7 +42,7 @@ const DemoShowcase = () => {
 
   if (!isOpen) {
     return (
-      <div className="bg-white rounded-2xl border border-slate-200 p-8 text-center shadow-sm relative overflow-hidden group hover:shadow-md transition-shadow">
+      <div className="bg-white rounded-2xl border border-slate-200 p-8 text-center shadow-sm relative overflow-hidden group hover:shadow-md transition-shadow h-full flex flex-col justify-center">
         <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 to-purple-600"></div>
         <h2 className="text-2xl font-bold text-slate-800 mb-2">See Gemini 3 in Action</h2>
         <p className="text-slate-500 mb-6 max-w-lg mx-auto">
@@ -54,7 +67,7 @@ const DemoShowcase = () => {
             <span className="bg-cyan-500/20 text-cyan-300 text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider">Gemini 3 Processed</span>
             <span className="text-slate-400 text-xs">• 5m 30s Audio</span>
           </div>
-          <h3 className="text-xl font-bold">Lecture: The Future of Renewable Energy</h3>
+          <h3 className="text-xl font-bold">Lecture: Renewable Energy</h3>
         </div>
         <button onClick={() => setIsOpen(false)} className="text-slate-400 hover:text-white">✕</button>
       </div>
@@ -63,8 +76,8 @@ const DemoShowcase = () => {
       <div className="flex border-b border-slate-100 overflow-x-auto">
         <button onClick={() => setActiveTab('summary')} className={`flex-1 py-3 text-sm font-bold border-b-2 transition-colors px-4 whitespace-nowrap ${activeTab === 'summary' ? 'border-blue-500 text-blue-600' : 'border-transparent text-slate-500 hover:text-slate-700'}`}>Summary</button>
         <button onClick={() => setActiveTab('points')} className={`flex-1 py-3 text-sm font-bold border-b-2 transition-colors px-4 whitespace-nowrap ${activeTab === 'points' ? 'border-purple-500 text-purple-600' : 'border-transparent text-slate-500 hover:text-slate-700'}`}>Key Points</button>
-        <button onClick={() => setActiveTab('translation')} className={`flex-1 py-3 text-sm font-bold border-b-2 transition-colors px-4 whitespace-nowrap ${activeTab === 'translation' ? 'border-green-500 text-green-600' : 'border-transparent text-slate-500 hover:text-slate-700'}`}>Translation (ES)</button>
-        <button onClick={() => setActiveTab('quiz')} className={`flex-1 py-3 text-sm font-bold border-b-2 transition-colors px-4 whitespace-nowrap ${activeTab === 'quiz' ? 'border-pink-500 text-pink-600' : 'border-transparent text-slate-500 hover:text-slate-700'}`}>AI Quiz</button>
+        <button onClick={() => setActiveTab('translation')} className={`flex-1 py-3 text-sm font-bold border-b-2 transition-colors px-4 whitespace-nowrap ${activeTab === 'translation' ? 'border-green-500 text-green-600' : 'border-transparent text-slate-500 hover:text-slate-700'}`}>Translation</button>
+        <button onClick={() => setActiveTab('quiz')} className={`flex-1 py-3 text-sm font-bold border-b-2 transition-colors px-4 whitespace-nowrap ${activeTab === 'quiz' ? 'border-pink-500 text-pink-600' : 'border-transparent text-slate-500 hover:text-slate-700'}`}>Quiz</button>
       </div>
 
       {/* Body */}
@@ -179,19 +192,27 @@ export default function Home() {
           </div>
 
           <div className="relative overflow-hidden rounded-3xl bg-gradient-header p-8 md:p-12 text-white shadow-lg shadow-slate-300">
-            <div className="relative z-10 max-w-2xl">
-              <div className="flex items-center gap-3 mb-4 opacity-90">
-                <Brain className="w-10 h-10 text-cyan-300 drop-shadow-md" />
-                <span className="text-xl md:text-2xl font-bold tracking-tight text-white leading-tight">
-                  Democratizing Education Globally <span className="text-cyan-300">with Gemini 3</span>
-                </span>
-                <span className="bg-white/20 text-xs font-bold px-2 py-1 rounded-full border border-white/20 ml-2">Powered by Gemini 3</span>
+            <div className="relative z-10 max-w-3xl">
+              <div className="flex flex-col md:flex-row md:items-center gap-4 mb-4 opacity-90">
+                <div className="flex items-center gap-3 bg-white/10 backdrop-blur-md px-5 py-3 rounded-full border border-white/20 shadow-lg">
+                  <GeminiIcon className="w-8 h-8 animate-pulse drop-shadow-lg" />
+                  <span className="text-lg font-bold tracking-wide text-white drop-shadow-md">POWERED BY GOOGLE GEMINI 3</span>
+                </div>
               </div>
 
-              <h1 className="text-3xl md:text-5xl font-bold mb-4 tracking-tight">Hello, {userName}!</h1>
+              <div className="mb-2">
+                <h1 className="text-3xl md:text-5xl font-bold tracking-tight text-white leading-tight">
+                  Democratizing Education Globally <span className="text-cyan-300">with AI</span>
+                </h1>
+              </div>
 
-              <p className="text-indigo-100 text-lg mb-8 leading-relaxed font-medium opacity-90">
-                Ready to capture your next lecture? I can transcribe, summarize, and translate seamlessly using Google's most advanced AI.
+              <div className="flex items-center gap-3 mb-6">
+                <div className="h-px w-12 bg-indigo-300/50"></div>
+                <p className="text-indigo-100 font-medium">Next-Gen Multimodal Learning Assistant</p>
+              </div>
+
+              <p className="text-indigo-50 text-lg mb-8 leading-relaxed font-medium max-w-2xl">
+                {userName}, ready to capture your next lecture? Experience 1M+ token context and reasoning for seamless transcription, summarization, and translation.
               </p>
 
               <div className="flex flex-wrap gap-4 items-center">
@@ -205,10 +226,9 @@ export default function Home() {
                     Sign in with Google
                   </button>
                 )}
-
                 {session && (
                   <Link href={folderLink} target="_blank" className="bg-white/20 text-white px-6 py-3 rounded-xl font-bold hover:bg-white/30 transition-colors backdrop-blur-sm border border-white/20 flex items-center gap-2">
-                    <FolderOpen className="w-5 h-5" /> Open Drive Folder
+                    <FolderOpen className="w-5 h-5" /> Drive
                   </Link>
                 )}
               </div>
