@@ -4,7 +4,7 @@ import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { Sidebar } from "@/components/Sidebar";
 import Image from "next/image";
-import { Mic, FolderOpen, Brain, PlayCircle, FileText, ExternalLink } from "lucide-react";
+import { Mic, FolderOpen, Brain, PlayCircle, FileText, ExternalLink, Languages } from "lucide-react";
 import { useState, useEffect } from "react";
 
 // Gemini Icon using Official Google Colors gradient
@@ -130,6 +130,50 @@ const DemoShowcase = () => {
   );
 };
 
+const WorkflowVisual = () => (
+  <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-4 relative w-full max-w-xs hidden xl:block">
+    <div className="absolute top-2 left-4 text-[10px] font-bold text-white/40 tracking-widest">AI PIPELINE</div>
+    <div className="grid grid-cols-2 gap-y-6 gap-x-8 items-center justify-items-center mt-4">
+      {/* Step 1: Voice */}
+      <div className="text-center group flex flex-col items-center relative">
+        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center mb-1 shadow-lg shadow-purple-900/20 ring-2 ring-white/10">
+          <Mic className="w-5 h-5 text-white" />
+        </div>
+        <p className="text-[9px] text-indigo-200 font-bold uppercase tracking-wide">Capture</p>
+        {/* Arrow Right */}
+        <svg className="absolute top-4 -right-6 w-4 h-4 text-white/20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
+      </div>
+
+      {/* Step 2: AI */}
+      <div className="text-center group flex flex-col items-center">
+        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center mb-1 shadow-lg shadow-cyan-900/20 ring-2 ring-white/20 animate-pulse">
+          <Brain className="w-5 h-5 text-white" />
+        </div>
+        <p className="text-[9px] text-cyan-200 font-bold uppercase tracking-wide">Gemini 3</p>
+      </div>
+
+      {/* Step 3: Trans */}
+      <div className="text-center group flex flex-col items-center relative">
+        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-pink-500 to-rose-500 flex items-center justify-center mb-1 shadow-lg shadow-rose-900/20 ring-2 ring-white/10">
+          <Languages className="w-5 h-5 text-white" />
+        </div>
+        <p className="text-[9px] text-pink-200 font-bold uppercase tracking-wide">Translate</p>
+        {/* Arrow Up-Right (Diagonal logic? No just right to next grid?) */}
+        {/* Arrow Right */}
+        <svg className="absolute top-4 -right-6 w-4 h-4 text-white/20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
+      </div>
+
+      {/* Step 4: Storage */}
+      <div className="text-center group flex flex-col items-center">
+        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center mb-1 shadow-lg shadow-teal-900/20 ring-2 ring-white/10">
+          <FolderOpen className="w-5 h-5 text-white" />
+        </div>
+        <p className="text-[9px] text-emerald-200 font-bold uppercase tracking-wide">Drive</p>
+      </div>
+    </div>
+  </div>
+);
+
 export default function Home() {
   const { data: session, status } = useSession();
   const [recentActivity, setRecentActivity] = useState<any[]>([]);
@@ -221,10 +265,16 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* Right: Badge (Extreme Right) */}
-              <div className="flex items-center gap-3 bg-white px-5 py-3 rounded-full shadow-2xl hover:scale-105 transition-transform cursor-default shrink-0 self-start mt-2 md:mt-0 border border-slate-200">
-                <GeminiIcon className="w-8 h-8 drop-shadow-sm" />
-                <span className="text-lg font-extrabold tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-purple-600 to-pink-500 whitespace-nowrap drop-shadow-sm">POWERED BY GEMINI 3</span>
+              {/* Right Side: Badge & Workflow */}
+              <div className="flex flex-col items-end gap-6 shrink-0 z-20">
+                {/* Badge */}
+                <div className="flex items-center gap-3 bg-white px-5 py-3 rounded-full shadow-2xl hover:scale-105 transition-transform cursor-default border border-slate-200">
+                  <GeminiIcon className="w-8 h-8 drop-shadow-sm" />
+                  <span className="text-lg font-extrabold tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-purple-600 to-pink-500 whitespace-nowrap drop-shadow-sm">POWERED BY GEMINI 3</span>
+                </div>
+
+                {/* Workflow Diagram */}
+                <WorkflowVisual />
               </div>
             </div>
 
