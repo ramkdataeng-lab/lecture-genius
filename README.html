@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LectureGenius - README</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .gradient-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .code-block {
+            background: #1e293b;
+            border-radius: 12px;
+            overflow-x: auto;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            border-radius: 9999px;
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+    </style>
+</head>
+
+<body class="bg-slate-50">
+
+    <!-- Header -->
+    <header class="gradient-header text-white py-20 px-8">
+        <div class="max-w-6xl mx-auto text-center">
+            <h1 class="text-6xl font-black mb-4">🧠 LectureGenius</h1>
+            <p class="text-2xl text-indigo-100 mb-8">Democratizing Education Globally with AI</p>
+
+            <div class="flex flex-wrap justify-center gap-3 mb-8">
+                <span class="badge bg-blue-500 text-white">Powered by Gemini 3.0 Flash</span>
+                <span class="badge bg-black text-white">Next.js 14</span>
+                <span class="badge bg-green-500 text-white">Live Demo</span>
+            </div>
+
+            <p class="text-xl text-indigo-100 max-w-3xl mx-auto leading-relaxed">
+                An AI-powered lecture companion that records, transcribes, summarizes, and translates lectures in
+                real-time,
+                syncing neatly formatted Google Docs directly to your Drive.
+            </p>
+
+            <div class="flex flex-wrap justify-center gap-4 mt-8">
+                <a href="https://lecture-genius.vercel.app" target="_blank"
+                    class="bg-white text-indigo-600 px-8 py-3 rounded-xl font-bold hover:bg-indigo-50 transition-all shadow-lg">
+                    🚀 Live Demo
+                </a>
+                <a href="https://github.com/ramkdataeng-lab/lecture-genius" target="_blank"
+                    class="bg-white/10 backdrop-blur-sm border-2 border-white text-white px-8 py-3 rounded-xl font-bold hover:bg-white/20 transition-all">
+                    📁 View on GitHub
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto px-8 py-16 space-y-16">
+
+        <!-- Features Grid -->
+        <section>
+            <h2 class="text-4xl font-bold text-slate-900 mb-8 text-center">✨ Features</h2>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Feature 1 -->
+                <div class="bg-white p-6 rounded-2xl shadow-lg border border-slate-200 hover:shadow-xl transition-all">
+                    <div class="text-4xl mb-4">🎙️</div>
+                    <h3 class="text-xl font-bold text-slate-900 mb-2">Live Audio Visualizer</h3>
+                    <p class="text-slate-600">Real-time frequency visualization with animated waveforms that respond to
+                        your voice.</p>
+                </div>
+
+                <!-- Feature 2 -->
+                <div class="bg-white p-6 rounded-2xl shadow-lg border border-slate-200 hover:shadow-xl transition-all">
+                    <div class="text-4xl mb-4">💬</div>
+                    <h3 class="text-xl font-bold text-slate-900 mb-2">Real-Time Captions</h3>
+                    <p class="text-slate-600">Live speech-to-text transcription shows what you're saying as you speak.
+                    </p>
+                </div>
+
+                <!-- Feature 3 -->
+                <div class="bg-white p-6 rounded-2xl shadow-lg border border-slate-200 hover:shadow-xl transition-all">
+                    <div class="text-4xl mb-4">🧠</div>
+                    <h3 class="text-xl font-bold text-slate-900 mb-2">Gemini Intelligence</h3>
+                    <p class="text-slate-600">Multimodal audio processing with intelligent summarization and structured
+                        output.</p>
+                </div>
+
+                <!-- Feature 4 -->
+                <div class="bg-white p-6 rounded-2xl shadow-lg border border-slate-200 hover:shadow-xl transition-all">
+                    <div class="text-4xl mb-4">🌍</div>
+                    <h3 class="text-xl font-bold text-slate-900 mb-2">Universal Translator</h3>
+                    <p class="text-slate-600">Automatic translation to 50+ languages with smart default preferences.</p>
+                </div>
+
+                <!-- Feature 5 -->
+                <div class="bg-white p-6 rounded-2xl shadow-lg border border-slate-200 hover:shadow-xl transition-all">
+                    <div class="text-4xl mb-4">📂</div>
+                    <h3 class="text-xl font-bold text-slate-900 mb-2">Google Drive Sync</h3>
+                    <p class="text-slate-600">All recordings and notes automatically saved to your personal Drive.</p>
+                </div>
+
+                <!-- Feature 6 -->
+                <div class="bg-white p-6 rounded-2xl shadow-lg border border-slate-200 hover:shadow-xl transition-all">
+                    <div class="text-4xl mb-4">🔐</div>
+                    <h3 class="text-xl font-bold text-slate-900 mb-2">Secure Auth</h3>
+                    <p class="text-slate-600">Sign in with Google Account using OAuth 2.0. Your data stays in YOUR
+                        Drive.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- How It Works -->
+        <section class="bg-gradient-to-br from-indigo-50 to-purple-50 p-12 rounded-3xl border-2 border-indigo-200">
+            <h2 class="text-4xl font-bold text-slate-900 mb-8 text-center">🎯 How It Works</h2>
+
+            <div class="grid md:grid-cols-5 gap-6">
+                <div class="text-center">
+                    <div
+                        class="w-16 h-16 bg-indigo-600 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">
+                        1</div>
+                    <h3 class="font-bold text-slate-900 mb-2">Record</h3>
+                    <p class="text-sm text-slate-600">Click "Start Recording" and speak naturally</p>
+                </div>
+
+                <div class="text-center">
+                    <div
+                        class="w-16 h-16 bg-purple-600 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">
+                        2</div>
+                    <h3 class="font-bold text-slate-900 mb-2">Visualize</h3>
+                    <p class="text-sm text-slate-600">Watch live visualizer and real-time captions</p>
+                </div>
+
+                <div class="text-center">
+                    <div
+                        class="w-16 h-16 bg-pink-600 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">
+                        3</div>
+                    <h3 class="font-bold text-slate-900 mb-2">Process</h3>
+                    <p class="text-sm text-slate-600">Gemini generates structured notes</p>
+                </div>
+
+                <div class="text-center">
+                    <div
+                        class="w-16 h-16 bg-cyan-600 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">
+                        4</div>
+                    <h3 class="font-bold text-slate-900 mb-2">Translate</h3>
+                    <p class="text-sm text-slate-600">Automatic translation to your language</p>
+                </div>
+
+                <div class="text-center">
+                    <div
+                        class="w-16 h-16 bg-green-600 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">
+                        5</div>
+                    <h3 class="font-bold text-slate-900 mb-2">Save</h3>
+                    <p class="text-sm text-slate-600">Everything syncs to Google Drive</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tech Stack -->
+        <section>
+            <h2 class="text-4xl font-bold text-slate-900 mb-8 text-center">🛠️ Tech Stack</h2>
+
+            <div class="bg-white p-8 rounded-3xl shadow-lg border border-slate-200">
+                <table class="w-full">
+                    <thead>
+                        <tr class="border-b-2 border-slate-200">
+                            <th class="text-left py-4 px-4 font-bold text-slate-900">Category</th>
+                            <th class="text-left py-4 px-4 font-bold text-slate-900">Technology</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-slate-700">
+                        <tr class="border-b border-slate-100">
+                            <td class="py-4 px-4 font-semibold">Frontend</td>
+                            <td class="py-4 px-4">Next.js 14, React, TypeScript, Tailwind CSS</td>
+                        </tr>
+                        <tr class="border-b border-slate-100">
+                            <td class="py-4 px-4 font-semibold">AI Engine</td>
+                            <td class="py-4 px-4">Google Gemini 3.0 Flash (Multimodal)</td>
+                        </tr>
+                        <tr class="border-b border-slate-100">
+                            <td class="py-4 px-4 font-semibold">Audio</td>
+                            <td class="py-4 px-4">Web Audio API, Web Speech Recognition API</td>
+                        </tr>
+                        <tr class="border-b border-slate-100">
+                            <td class="py-4 px-4 font-semibold">Authentication</td>
+                            <td class="py-4 px-4">NextAuth.js with Google OAuth 2.0</td>
+                        </tr>
+                        <tr class="border-b border-slate-100">
+                            <td class="py-4 px-4 font-semibold">Storage</td>
+                            <td class="py-4 px-4">Google Drive API</td>
+                        </tr>
+                        <tr>
+                            <td class="py-4 px-4 font-semibold">Deployment</td>
+                            <td class="py-4 px-4">Vercel</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Quick Start -->
+        <section class="bg-slate-900 text-white p-12 rounded-3xl">
+            <h2 class="text-4xl font-bold mb-8 text-center">🚀 Quick Start</h2>
+
+            <div class="space-y-6 max-w-3xl mx-auto">
+                <div>
+                    <h3 class="text-xl font-bold mb-3 text-indigo-300">1. Clone the repository</h3>
+                    <div class="code-block p-4">
+                        <pre class="text-sm text-slate-200"><code>git clone https://github.com/ramkdataeng-lab/lecture-genius.git
+cd lecture-genius</code></pre>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 class="text-xl font-bold mb-3 text-indigo-300">2. Install dependencies</h3>
+                    <div class="code-block p-4">
+                        <pre class="text-sm text-slate-200"><code>npm install</code></pre>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 class="text-xl font-bold mb-3 text-indigo-300">3. Set up environment variables</h3>
+                    <div class="code-block p-4">
+                        <pre class="text-sm text-slate-200"><code>NEXTAUTH_URL=http://localhost:3000
+NEXTAUTH_SECRET=your_random_secret
+GOOGLE_CLIENT_ID=your_google_client_id
+GOOGLE_CLIENT_SECRET=your_google_client_secret
+GEMINI_API_KEY=your_gemini_api_key</code></pre>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 class="text-xl font-bold mb-3 text-indigo-300">4. Run the development server</h3>
+                    <div class="code-block p-4">
+                        <pre class="text-sm text-slate-200"><code>npm run dev</code></pre>
+                    </div>
+                </div>
+
+                <div class="bg-indigo-600 p-6 rounded-xl text-center">
+                    <p class="text-lg font-bold">Open <a href="http://localhost:3000"
+                            class="underline">http://localhost:3000</a> 🎉</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Use Cases -->
+        <section>
+            <h2 class="text-4xl font-bold text-slate-900 mb-8 text-center">🎓 Use Cases</h2>
+
+            <div class="grid md:grid-cols-2 gap-6">
+                <div class="bg-white p-6 rounded-2xl shadow-lg border border-slate-200">
+                    <h3 class="text-xl font-bold text-slate-900 mb-2">👨‍🎓 Students</h3>
+                    <p class="text-slate-600">Never miss a lecture detail, get notes in your native language</p>
+                </div>
+
+                <div class="bg-white p-6 rounded-2xl shadow-lg border border-slate-200">
+                    <h3 class="text-xl font-bold text-slate-900 mb-2">👩‍🏫 Educators</h3>
+                    <p class="text-slate-600">Create accessible content for international students</p>
+                </div>
+
+                <div class="bg-white p-6 rounded-2xl shadow-lg border border-slate-200">
+                    <h3 class="text-xl font-bold text-slate-900 mb-2">🔬 Researchers</h3>
+                    <p class="text-slate-600">Transcribe interviews and seminars automatically</p>
+                </div>
+
+                <div class="bg-white p-6 rounded-2xl shadow-lg border border-slate-200">
+                    <h3 class="text-xl font-bold text-slate-900 mb-2">🌐 Language Learners</h3>
+                    <p class="text-slate-600">Study in one language, review in another</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Hackathon -->
+        <section
+            class="bg-gradient-to-r from-yellow-400 via-red-500 to-pink-500 p-12 rounded-3xl text-white text-center">
+            <h2 class="text-4xl font-bold mb-4">🏆 Hackathon Submission</h2>
+            <p class="text-xl mb-6">Built for the Gemini API Developer Competition on Devpost</p>
+
+            <div class="flex flex-wrap justify-center gap-4">
+                <a href="https://lecture-genius.vercel.app" target="_blank"
+                    class="bg-white text-pink-600 px-6 py-3 rounded-xl font-bold hover:bg-pink-50 transition-all">
+                    Live Demo
+                </a>
+                <a href="https://github.com/ramkdataeng-lab/lecture-genius" target="_blank"
+                    class="bg-white/20 backdrop-blur-sm border-2 border-white text-white px-6 py-3 rounded-xl font-bold hover:bg-white/30 transition-all">
+                    GitHub
+                </a>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-slate-900 text-slate-400 py-12 px-8 text-center mt-16">
+        <p class="text-lg mb-2">Built with ❤️ using Gemini 3.0 Flash, Next.js, and Tailwind CSS</p>
+        <p class="text-sm">© 2026 LectureGenius - Democratizing Education Globally</p>
+        <p class="text-sm mt-4">⭐ Star this repo if you find it helpful!</p>
+    </footer>
+
+</body>
+
+</html>
