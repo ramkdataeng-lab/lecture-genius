@@ -40,6 +40,9 @@ export default function AboutPage() {
 
                             <div className="mt-8 pt-8 border-t border-slate-200">
                                 <p className="text-xs font-bold text-slate-400">© 2026 All Rights Reserved</p>
+                                <p className="text-[10px] text-slate-400 font-medium mt-3 uppercase tracking-wider opacity-70">
+                                    Designed to be submitted for the Google Hackathon
+                                </p>
                             </div>
                         </div>
 

@@ -93,10 +93,6 @@ export function Sidebar() {
 
                 <div className="pt-4 border-t border-slate-200/60 flex flex-col gap-0.5">
                     <p className="text-[10px] font-medium text-slate-400">© 2026 LectureGenius</p>
-                    <p className="text-[10px] text-slate-400">Dev: <span className="font-semibold text-slate-500">Ramkumar</span></p>
-                    <a href="mailto:ramkgvn@gmail.com" className="text-[10px] text-indigo-400 hover:text-indigo-600 transition-colors truncate block font-medium mt-0.5">
-                        ramkgvn@gmail.com
-                    </a>
                 </div>
             </div>
         </aside>
