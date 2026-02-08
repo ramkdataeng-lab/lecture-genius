@@ -130,43 +130,6 @@ const DemoShowcase = () => {
   );
 };
 
-const WorkflowVisual = () => {
-  return (
-    <div className="relative w-[320px] h-[180px] bg-slate-900/5 backdrop-blur-sm border border-white/5 rounded-2xl hidden xl:block overflow-hidden shadow-inner shrink-0 scale-95 origin-right">
-      {/* Background Image - User must provide public/workflow.png */}
-      <div className="absolute inset-0 z-0 flex items-center justify-center opacity-80 mix-blend-screen">
-        <img src="/workflow.png" alt="AI Process Workflow" className="w-full h-full object-contain" />
-      </div>
-
-      {/* Overlay SVG Animations - Paths hidden, but dots travel along them */}
-      <svg className="absolute inset-0 w-full h-full pointer-events-none z-10" viewBox="0 0 320 180" preserveAspectRatio="none">
-        {/* Path 1: Voice (Left Top) -> AI (Right Top) */}
-        <path d="M 60 45 H 260" stroke="transparent" fill="none" />
-        <circle r="3" fill="#a5b4fc" className="drop-shadow-[0_0_8px_rgba(165,180,252,0.8)]">
-          <animateMotion dur="2s" repeatCount="indefinite" path="M 60 45 H 260" keyPoints="0;1" keyTimes="0;1" calcMode="linear" />
-        </circle>
-
-        {/* Path 2: AI (Right Top) -> Cloud (Right Bottom) - Curved Exterior */}
-        <path d="M 280 65 Q 310 90 280 115" stroke="transparent" fill="none" />
-        <circle r="3" fill="#22d3ee" className="drop-shadow-[0_0_8px_rgba(34,211,238,0.8)]">
-          <animateMotion dur="2.5s" repeatCount="indefinite" begin="1s" path="M 280 65 Q 310 90 280 115" />
-        </circle>
-
-        {/* Path 3: Trans (Left Bottom) -> Cloud (Right Bottom) */}
-        <path d="M 60 135 H 260" stroke="transparent" fill="none" />
-        <circle r="3" fill="#f472b6" className="drop-shadow-[0_0_8px_rgba(244,114,182,0.8)]">
-          <animateMotion dur="2s" repeatCount="indefinite" begin="0.8s" path="M 60 135 H 260" />
-        </circle>
-      </svg>
-
-      {/* Fallback Text if image fails */}
-      <div className="absolute inset-0 -z-10 flex items-center justify-center text-xs text-white/20 font-mono">
-        Waiting for workflow.png...
-      </div>
-    </div>
-  );
-};
-
 export default function Home() {
   const { data: session, status } = useSession();
   const [recentActivity, setRecentActivity] = useState<any[]>([]);
@@ -265,9 +228,6 @@ export default function Home() {
                   <GeminiIcon className="w-8 h-8 drop-shadow-sm" />
                   <span className="text-lg font-extrabold tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-purple-600 to-pink-500 whitespace-nowrap drop-shadow-sm">POWERED BY GEMINI 3</span>
                 </div>
-
-                {/* Workflow Diagram */}
-                <WorkflowVisual />
               </div>
             </div>
 
