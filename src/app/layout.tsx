@@ -17,6 +17,11 @@ import { Providers } from "@/components/Providers";
 export const metadata: Metadata = {
   title: "LectureGenius",
   description: "AI-Powered Lecture Recorder & Summarizer",
+  icons: {
+    icon: "/bookmark-icon.svg",
+    apple: "/bookmark-icon.svg",
+    shortcut: "/bookmark-icon.svg"
+  }
 };
 
 export default function RootLayout({
