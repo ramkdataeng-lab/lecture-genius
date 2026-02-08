@@ -88,7 +88,7 @@ export async function POST(req: NextRequest) {
                 const summarySnippet = notesObj.summary || "No summary available";
 
                 // Generate HTML for Google Doc
-                const htmlContent = `
+                let htmlContent = `
                     <html>
                     <head><style>body { font-family: Arial, sans-serif; line-height: 1.6; }</style></head>
                     <body>
@@ -112,6 +112,52 @@ export async function POST(req: NextRequest) {
                     </html>
                 `;
 
+                // Check for default target language and translate if needed
+                const targetLanguage = formData.get("targetLanguage") as string;
+                if (targetLanguage && targetLanguage !== "English") {
+                    try {
+                        const { translateContent } = await import("@/lib/gemini");
+                        // Parallel translation for speed
+                        const [transSummary, transNotes, transPoints] = await Promise.all([
+                            translateContent(notesObj.summary || "", targetLanguage),
+                            translateContent(notesObj.detailed_notes || "", targetLanguage),
+                            translateContent((notesObj.key_points || []).join('\n'), targetLanguage)
+                        ]);
+
+                        const translatedHtml = `
+                            <html>
+                            <head><style>body { font-family: Arial, sans-serif; line-height: 1.6; }</style></head>
+                            <body>
+                                <h1>${notesObj.title} (${targetLanguage})</h1>
+                                <p><strong>Date:</strong> ${new Date().toLocaleDateString()}</p>
+                                <hr/>
+                                <h2>Summary</h2>
+                                <p>${transSummary}</p>
+                                <h2>Key Points</h2>
+                                <ul>${transPoints.split('\n').map((p: string) => `<li>${p}</li>`).join('')}</ul>
+                                <h2>Detailed Notes</h2>
+                                <div>${transNotes.replace(/\n/g, '<br/>')}</div>
+                                <hr/>
+                                <p style="color: #666; font-size: 0.8em;">Translated to ${targetLanguage} by LectureGenius AI</p>
+                            </body>
+                            </html>
+                         `;
+
+                        // Upload Translated Doc
+                        await uploadToDrive(
+                            session.accessToken,
+                            Buffer.from(translatedHtml),
+                            `${lectureTitle} (${targetLanguage})`,
+                            targetFolderId,
+                            "AI Translated Lecture Notes",
+                            "application/vnd.google-apps.document",
+                            useAsFolderId
+                        );
+                    } catch (transError) {
+                        console.error("Translation Error:", transError);
+                    }
+                }
+
                 // Upload JSON (for App History)
                 await uploadToDrive(
                     session.accessToken,
@@ -123,14 +169,14 @@ export async function POST(req: NextRequest) {
                     useAsFolderId
                 );
 
-                // Upload Google Doc (for User Viewing)
+                // Upload Google Doc (Original)
                 await uploadToDrive(
                     session.accessToken,
                     Buffer.from(htmlContent),
-                    lectureTitle, // Google Doc name (no extension needed usually, but Drive handles it)
+                    lectureTitle,
                     targetFolderId,
                     "AI Generated Lecture Notes",
-                    "application/vnd.google-apps.document", // Convert to Google Doc
+                    "application/vnd.google-apps.document",
                     useAsFolderId
                 );
             } catch (err) {

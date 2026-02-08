@@ -121,23 +121,9 @@ export async function listFiles(accessToken: string, folderName: string = "Lectu
     const drive = google.drive({ version: "v3", auth });
 
     try {
-        // 1. Find folder ID
-        const qFolder = `mimeType='application/vnd.google-apps.folder' and name='${folderName}' and trashed=false`;
-        const resFolder = await drive.files.list({
-            q: qFolder,
-            fields: "files(id)",
-        });
-
-        if (!resFolder.data.files || resFolder.data.files.length === 0) {
-            return [];
-        }
-
-        const folderId = resFolder.data.files[0].id;
-
-        // 2. List files in folder
-        // We only want JSON files (which contain the summary/metadata) or we can list all.
-        // Let's list JSON notes files as they hold the summary.
-        const qFiles = `'${folderId}' in parents and mimeType != 'application/vnd.google-apps.folder' and trashed=false`;
+        // Search for JSON notes files globally (recursive search by nature of not specifying parent)
+        // We look for files ending in _Notes.json
+        const qFiles = `name contains '_Notes.json' and mimeType = 'application/json' and trashed=false`;
 
         const resFiles = await drive.files.list({
             q: qFiles,

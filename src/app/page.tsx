@@ -4,13 +4,13 @@ import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { Sidebar } from "@/components/Sidebar";
 import Image from "next/image";
-import { Mic, FolderOpen, Brain, ChevronRight, PlayCircle } from "lucide-react";
+import { Mic, FolderOpen, Brain, ChevronRight, PlayCircle, FileText, ExternalLink } from "lucide-react";
 import { useState, useEffect } from "react";
 
 export default function Home() {
   const { data: session, status } = useSession();
-
-  // Allow Guest Access - Removed the early return for !session
+  const [recentActivity, setRecentActivity] = useState<any[]>([]);
+  const [loadingActivity, setLoadingActivity] = useState(false);
 
   const QuickAction = ({ icon: Icon, title, desc, link, color }: any) => (
     <Link href={link} className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all group flex flex-col items-center text-center h-full justify-center">
@@ -26,12 +26,27 @@ export default function Home() {
 
   useEffect(() => {
     if (session) {
+      // Fetch Folder Link
       fetch('/api/drive-folder')
         .then(res => res.json())
         .then(data => {
           if (data.webViewLink) setFolderLink(data.webViewLink);
         })
         .catch(err => console.error(err));
+
+      // Fetch Recent Activity
+      setLoadingActivity(true);
+      fetch('/api/history')
+        .then(res => res.json())
+        .then(data => {
+          if (data.files) {
+            // Filter for _Notes.json only (just to be safe, though API does it now)
+            const notes = data.files.filter((f: any) => f.name.includes('_Notes.json'));
+            setRecentActivity(notes.slice(0, 5)); // Top 5
+          }
+        })
+        .catch(err => console.error(err))
+        .finally(() => setLoadingActivity(false));
     }
   }, [session]);
 
@@ -59,9 +74,11 @@ export default function Home() {
 
           <div className="relative overflow-hidden rounded-3xl bg-gradient-header p-8 md:p-12 text-white shadow-lg shadow-slate-300">
             <div className="relative z-10 max-w-2xl">
-              <div className="flex items-center gap-2 mb-2 opacity-90">
-                <Brain className="w-5 h-5 text-cyan-300" />
-                <span className="text-sm font-semibold tracking-wide text-cyan-100">Ai powered Lecture Assistant</span>
+              <div className="flex items-center gap-3 mb-4 opacity-90">
+                <Brain className="w-10 h-10 text-cyan-300 drop-shadow-md" />
+                <span className="text-xl md:text-2xl font-bold tracking-tight text-white leading-tight">
+                  Democratizing Education Globally <span className="text-cyan-300">with AI</span>
+                </span>
               </div>
 
               <h1 className="text-3xl md:text-5xl font-bold mb-4 tracking-tight">Hello, {userName}!</h1>
@@ -106,20 +123,105 @@ export default function Home() {
           <h2 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4 px-1">Actions</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <QuickAction icon={Mic} title="Record Lecture" desc="Start capturing audio" link="/record" color="bg-rose-500" />
-            <QuickAction icon={FolderOpen} title="My Recordings" desc="View all files in Drive" link={folderLink} color="bg-cyan-500" />
-            <QuickAction icon={PlayCircle} title="Recent Summaries" desc="Check latest outputs" link={folderLink} color="bg-violet-500" />
+            <button
+              onClick={() => window.open(folderLink, '_blank')}
+              className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all group flex flex-col items-center text-center h-full justify-center w-full"
+            >
+              <div className={`w-12 h-12 rounded-xl bg-cyan-500 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
+                <FolderOpen className="w-6 h-6 text-white" />
+              </div>
+              <h3 className="font-bold text-slate-800 mb-1">My Recordings</h3>
+              <p className="text-xs text-slate-400 font-medium">View all files in Drive</p>
+            </button>
+            <button
+              onClick={() => {
+                document.getElementById('recent-activity')?.scrollIntoView({ behavior: 'smooth' });
+              }}
+              className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all group flex flex-col items-center text-center h-full justify-center w-full"
+            >
+              <div className={`w-12 h-12 rounded-xl bg-violet-500 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
+                <PlayCircle className="w-6 h-6 text-white" />
+              </div>
+              <h3 className="font-bold text-slate-800 mb-1">Recent Summaries</h3>
+              <p className="text-xs text-slate-400 font-medium">Check latest outputs</p>
+            </button>
           </div>
         </div>
 
-        {/* Recent Recordings (Placeholder) */}
-        <div className="">
-          <h2 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4 px-1">Recent Activity</h2>
-          <div className="bg-white p-2 rounded-2xl border border-slate-100 shadow-sm space-y-1">
-            <div className="p-8 text-center text-slate-400 flex flex-col items-center">
-              <Mic className="w-12 h-12 text-slate-200 mb-4" />
-              <p className="text-sm font-medium">Your recent recordings will appear here once processed.</p>
+        {/* Social Cause / Mission Section */}
+        <div className="mb-10">
+          <h2 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4 px-1">Our Mission</h2>
+          <div className="bg-gradient-to-r from-violet-500 to-indigo-600 rounded-2xl p-6 md:p-8 text-white shadow-md relative overflow-hidden">
+            <div className="relative z-10">
+              <h3 className="text-2xl font-bold mb-3 flex items-center gap-2">
+                <span className="text-cyan-200">Democratizing Education</span> for the Global Student
+              </h3>
+              <p className="text-indigo-100 leading-relaxed max-w-3xl">
+                LectureGenius eliminates learning boundaries by integrating multiple languages, empowering every student—local or international—to become a global scholar. We believe in a world where you can listen to any class, in any language, breaking down barriers to knowledge one lecture at a time.
+              </p>
             </div>
+            {/* Decorative background circle */}
+            <div className="absolute -right-12 -bottom-24 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
           </div>
+        </div>
+
+        {/* Recent Recordings */}
+        <div id="recent-activity" className="scroll-mt-10">
+          <h2 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4 px-1">Recent Activity</h2>
+
+          {loadingActivity ? (
+            <div className="bg-white p-8 rounded-2xl border border-slate-100 shadow-sm text-center">
+              <div className="animate-spin w-8 h-8 border-4 border-indigo-200 border-t-indigo-600 rounded-full mx-auto mb-4"></div>
+              <p className="text-sm text-slate-400">Loading your recent notes...</p>
+            </div>
+          ) : recentActivity.length > 0 ? (
+            <div className="grid grid-cols-1 gap-4">
+              {recentActivity.map((file) => (
+                <div key={file.id} className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all flex flex-col md:flex-row gap-6 md:items-start group">
+                  <div className="bg-indigo-50 w-16 h-16 rounded-xl flex items-center justify-center shrink-0">
+                    <FileText className="w-8 h-8 text-indigo-600" />
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex justify-between items-start">
+                      <h3 className="font-bold text-slate-800 text-lg mb-1 group-hover:text-indigo-600 transition-colors">
+                        {file.name.replace('_Notes.json', '')}
+                      </h3>
+                      <span className="text-xs font-semibold text-slate-400 bg-slate-100 px-2 py-1 rounded">
+                        {new Date(file.createdTime).toLocaleDateString()}
+                      </span>
+                    </div>
+
+                    <p className="text-sm text-slate-500 leading-relaxed mb-4 line-clamp-2">
+                      {file.description || "No summary available."}
+                    </p>
+
+                    <div className="flex items-center gap-4">
+                      <Link
+                        href={file.webViewLink}
+                        target="_blank"
+                        className="text-sm font-bold text-indigo-600 hover:text-indigo-800 flex items-center gap-1"
+                      >
+                        <ExternalLink className="w-4 h-4" /> Open in Drive
+                      </Link>
+                      <button
+                        onClick={() => window.open(file.parents?.[0] ? `https://drive.google.com/drive/folders/${file.parents[0]}` : file.webViewLink, '_blank')}
+                        className="text-sm font-bold text-slate-500 hover:text-slate-700 flex items-center gap-1"
+                      >
+                        <FolderOpen className="w-4 h-4" /> Open Folder
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="bg-white p-2 rounded-2xl border border-slate-100 shadow-sm space-y-1">
+              <div className="p-8 text-center text-slate-400 flex flex-col items-center">
+                <Mic className="w-12 h-12 text-slate-200 mb-4" />
+                <p className="text-sm font-medium">Your recent recordings will appear here once processed.</p>
+              </div>
+            </div>
+          )}
         </div>
 
       </main>

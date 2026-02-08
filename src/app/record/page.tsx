@@ -26,7 +26,7 @@ export default function RecordPage() {
     const [result, setResult] = useState<any>(null);
     const [error, setError] = useState("");
     const [translatedContent, setTranslatedContent] = useState<string | null>(null);
-    const [targetLang, setTargetLang] = useState("Spanish");
+    const [targetLang, setTargetLang] = useState("English");
     const [isTranslating, setIsTranslating] = useState(false);
     const [showHistory, setShowHistory] = useState(false);
     const [history, setHistory] = useState<any[]>([]);
@@ -62,9 +62,16 @@ export default function RecordPage() {
 
     const chunksRef = useRef<Blob[]>([]);
     const timerRef = useRef<NodeJS.Timeout | null>(null);
+    const [captions, setCaptions] = useState("");
+    const canvasRef = useRef<HTMLCanvasElement>(null);
+    const audioContextRef = useRef<AudioContext | null>(null);
+    const analyserRef = useRef<AnalyserNode | null>(null);
+    const animationFrameRef = useRef<number | null>(null);
+    const recognitionRef = useRef<any>(null);
 
     const startRecording = async () => {
         setError("");
+        setCaptions("");
         try {
             const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
             const recorder = new MediaRecorder(stream);
@@ -90,6 +97,81 @@ export default function RecordPage() {
                 setTimer((prev) => prev + 1);
             }, 1000);
 
+            // --- Audio Visualizer Setup ---
+            const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
+            audioContextRef.current = audioCtx;
+            const analyser = audioCtx.createAnalyser();
+            analyser.fftSize = 256;
+            const source = audioCtx.createMediaStreamSource(stream);
+            source.connect(analyser);
+            analyserRef.current = analyser;
+
+            const drawVisualizer = () => {
+                if (!canvasRef.current) return;
+                const canvas = canvasRef.current;
+                const ctx = canvas.getContext("2d");
+                if (!ctx) return;
+
+                const bufferLength = analyser.frequencyBinCount;
+                const dataArray = new Uint8Array(bufferLength);
+                analyser.getByteFrequencyData(dataArray);
+
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                const barWidth = (canvas.width / bufferLength) * 2.5;
+                let barHeight;
+                let x = 0;
+
+                for (let i = 0; i < bufferLength; i++) {
+                    barHeight = dataArray[i] / 2;
+
+                    const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+                    gradient.addColorStop(0, '#818cf8'); // Indigo-400
+                    gradient.addColorStop(1, '#c084fc'); // Purple-500
+
+                    ctx.fillStyle = gradient;
+                    ctx.fillRect(x, canvas.height - barHeight, barWidth, barHeight);
+
+                    x += barWidth + 1;
+                }
+
+                animationFrameRef.current = requestAnimationFrame(drawVisualizer);
+            };
+            drawVisualizer();
+
+
+            // --- Live Captions Strategy (Web Speech API) ---
+            if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+                const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+                const recognition = new SpeechRecognition();
+                recognition.continuous = true;
+                recognition.interimResults = true;
+                recognition.lang = 'en-US'; // Default to English for now
+
+                recognition.onresult = (event: any) => {
+                    let interimTranscript = '';
+                    let finalTranscript = '';
+
+                    for (let i = event.resultIndex; i < event.results.length; ++i) {
+                        if (event.results[i].isFinal) {
+                            finalTranscript += event.results[i][0].transcript;
+                        } else {
+                            interimTranscript += event.results[i][0].transcript;
+                        }
+                    }
+                    if (finalTranscript || interimTranscript) {
+                        setCaptions(prev => {
+                            // Keep only last few lines to avoid overflow in preview
+                            const full = prev + (finalTranscript ? " " + finalTranscript : "");
+                            return full.slice(-200) + (interimTranscript ? " " + interimTranscript : "");
+                        });
+                    }
+                };
+
+                recognition.start();
+                recognitionRef.current = recognition;
+            }
+
         } catch (err) {
             console.error("Error accessing microphone:", err);
             setError("Could not access microphone. Please allow permissions.");
@@ -101,18 +183,27 @@ export default function RecordPage() {
             mediaRecorder.stop();
             if (timerRef.current) clearInterval(timerRef.current);
             mediaRecorder.stream.getTracks().forEach(track => track.stop());
+
+            // Stop Visualizer
+            if (animationFrameRef.current) cancelAnimationFrame(animationFrameRef.current);
+            if (audioContextRef.current) audioContextRef.current.close();
+
+            // Stop Captions
+            if (recognitionRef.current) recognitionRef.current.stop();
+
             setRecordingState("processing");
         }
     };
+
     const handleUpload = async (blob: Blob) => {
         const formData = new FormData();
         formData.append("audio", blob, "recording.webm");
         formData.append("title", lectureTitle || `Lecture ${new Date().toLocaleString()}`);
         formData.append("subject", subject || "General");
         formData.append("folderStructure", folderStructure);
+        formData.append("targetLanguage", targetLang);
 
         try {
-            // ...
             const res = await fetch("/api/process-lecture", {
                 method: "POST",
                 body: formData,
@@ -134,10 +225,7 @@ export default function RecordPage() {
         if (!result?.notes) return;
         setIsTranslating(true);
         try {
-            // Parse notes if string, otherwise use as is
             const notes = typeof result.notes === 'string' ? JSON.parse(result.notes) : result.notes;
-
-            // Format into a readable string for translation
             const textToTranslate = `
 # ${notes.title}
 
@@ -191,10 +279,7 @@ ${notes.detailed_notes}
             <Sidebar />
 
             <main className="flex-1 md:ml-64 p-8 overflow-y-auto">
-
                 <div className="flex flex-col lg:flex-row gap-8 min-h-[calc(100vh-4rem)]">
-
-
 
                     {/* History Panel */}
                     {showHistory && (
@@ -303,120 +388,141 @@ ${notes.detailed_notes}
                                     </div>
                                 </>
                             )}
+                            {
+                                recordingState === "recording" && (
+                                    <>
+                                        <div className="text-9xl font-mono text-slate-900 font-bold mb-8 tracking-tighter tabular-nums relative z-10 transition-all">
+                                            {formatTime(timer)}
+                                        </div>
 
-                            {recordingState === "recording" && (
-                                <>
-                                    <div className="text-9xl font-mono text-slate-900 font-bold mb-16 tracking-tighter tabular-nums relative z-10">
-                                        {formatTime(timer)}
-                                    </div>
+                                        {/* Audio Visualizer */}
+                                        <canvas
+                                            ref={canvasRef}
+                                            width={300}
+                                            height={100}
+                                            className="w-full max-w-sm h-32 mb-8 rounded-xl bg-slate-50 border border-slate-100 shadow-inner"
+                                        />
 
-                                    <div className="mic-pulse w-32 h-32 rounded-full absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none"></div>
+                                        {/* Live Captions Preview */}
+                                        <div className="h-24 w-full max-w-lg mb-8 text-center px-4 overflow-hidden relative">
+                                            <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-white via-transparent to-transparent z-10"></div>
+                                            <p className="text-xl font-medium text-slate-600 transition-all animate-in fade-in slide-in-from-bottom-2 duration-300">
+                                                "{captions || "Listening..."}"
+                                            </p>
+                                        </div>
 
-                                    <div className="flex items-center gap-8 relative z-10 mt-8">
-                                        <button
-                                            onClick={stopRecording}
-                                            className="w-24 h-24 rounded-full bg-white border-4 border-red-100 flex items-center justify-center shadow-lg hover:bg-red-50 active:scale-95 transition-all group"
-                                        >
-                                            <Square className="w-8 h-8 text-red-500 fill-red-500 rounded" />
-                                        </button>
-                                    </div>
-                                    <p className="mt-8 text-slate-400 font-medium animate-pulse">Recording active...</p>
-                                </>
-                            )}
+                                        <div className="flex items-center gap-8 relative z-10">
+                                            <button
+                                                onClick={stopRecording}
+                                                className="w-24 h-24 rounded-full bg-white border-4 border-red-100 flex items-center justify-center shadow-lg hover:bg-red-50 active:scale-95 transition-all group"
+                                            >
+                                                <Square className="w-8 h-8 text-red-500 fill-red-500 rounded" />
+                                            </button>
+                                        </div>
+                                        <p className="mt-8 text-slate-400 font-medium animate-pulse flex items-center gap-2">
+                                            <span className="w-2 h-2 rounded-full bg-red-500"></span> Recording active...
+                                        </p>
+                                    </>
+                                )
+                            }
 
-                            {recordingState === "processing" && (
-                                <div className="flex flex-col items-center justify-center space-y-6">
-                                    <div className="relative">
-                                        <div className="absolute inset-0 bg-indigo-500 rounded-full blur-xl opacity-20 animate-ping"></div>
-                                        <Loader2 className="w-16 h-16 text-indigo-600 animate-spin relative z-10" />
-                                    </div>
-                                    <div className="text-center space-y-2">
-                                        <h2 className="text-2xl font-bold text-slate-800">Processing Lecture</h2>
-                                        <p className="text-slate-500 max-w-xs">Gemini AI is transcribing and summarizing your audio...</p>
-                                    </div>
-                                </div>
-                            )}
-
-                            {recordingState === "completed" && result && (
-                                <div className="w-full animate-in fade-in zoom-in duration-300 text-left">
-                                    <div className="flex items-center justify-center mb-6">
-                                        <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center">
-                                            <FileCheck className="w-8 h-8 text-emerald-600" />
+                            {
+                                recordingState === "processing" && (
+                                    <div className="flex flex-col items-center justify-center space-y-6">
+                                        <div className="relative">
+                                            <div className="absolute inset-0 bg-indigo-500 rounded-full blur-xl opacity-20 animate-ping"></div>
+                                            <Loader2 className="w-16 h-16 text-indigo-600 animate-spin relative z-10" />
+                                        </div>
+                                        <div className="text-center space-y-2">
+                                            <h2 className="text-2xl font-bold text-slate-800">Processing Lecture</h2>
+                                            <p className="text-slate-500 max-w-xs">Gemini AI is transcribing and summarizing your audio...</p>
                                         </div>
                                     </div>
-                                    <h2 className="text-3xl font-bold text-slate-900 text-center mb-2">Lecture Processed!</h2>
-                                    <p className="text-slate-500 text-center mb-8 text-sm">Saved to Google Drive automatically.</p>
+                                )
+                            }
 
-                                    {/* Actions Row: Share & Drive */}
-                                    <div className="flex justify-center gap-3 mb-8">
-                                        <button onClick={() => handleShare('whatsapp')} className="p-2.5 bg-green-50 text-green-600 rounded-xl hover:bg-green-100 transition-colors border border-green-200">
-                                            <MessageCircle className="w-5 h-5" />
-                                        </button>
-                                        <button onClick={() => handleShare('email')} className="p-2.5 bg-blue-50 text-blue-600 rounded-xl hover:bg-blue-100 transition-colors border border-blue-200">
-                                            <Mail className="w-5 h-5" />
-                                        </button>
-                                        <a href={result.driveAudio?.webViewLink} target="_blank" className="px-5 py-2.5 bg-white text-indigo-600 border border-indigo-100 rounded-xl font-bold hover:bg-indigo-50 transition-colors flex items-center gap-2 text-sm">
-                                            Drive <Share2 className="w-4 h-4" />
-                                        </a>
-                                    </div>
+                            {
+                                recordingState === "completed" && result && (
+                                    <div className="w-full animate-in fade-in zoom-in duration-300 text-left">
+                                        <div className="flex items-center justify-center mb-6">
+                                            <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center">
+                                                <FileCheck className="w-8 h-8 text-emerald-600" />
+                                            </div>
+                                        </div>
+                                        <h2 className="text-3xl font-bold text-slate-900 text-center mb-2">Lecture Processed!</h2>
+                                        <p className="text-slate-500 text-center mb-8 text-sm">Saved to Google Drive automatically.</p>
 
-                                    {/* Summary View */}
-                                    <div className="bg-slate-50 rounded-2xl p-6 border border-slate-100 mb-6 max-h-[300px] overflow-y-auto shadow-inner prose prose-slate prose-sm max-w-none">
-                                        <ReactMarkdown>
-                                            {typeof result.notes === 'string' ? JSON.parse(result.notes).summary || result.notes : result.notes.summary}
-                                        </ReactMarkdown>
-                                    </div>
+                                        {/* Actions Row: Share & Drive */}
+                                        <div className="flex justify-center gap-3 mb-8">
+                                            <button onClick={() => handleShare('whatsapp')} className="p-2.5 bg-green-50 text-green-600 rounded-xl hover:bg-green-100 transition-colors border border-green-200">
+                                                <MessageCircle className="w-5 h-5" />
+                                            </button>
+                                            <button onClick={() => handleShare('email')} className="p-2.5 bg-blue-50 text-blue-600 rounded-xl hover:bg-blue-100 transition-colors border border-blue-200">
+                                                <Mail className="w-5 h-5" />
+                                            </button>
+                                            <a href={result.driveAudio?.webViewLink} target="_blank" className="px-5 py-2.5 bg-white text-indigo-600 border border-indigo-100 rounded-xl font-bold hover:bg-indigo-50 transition-colors flex items-center gap-2 text-sm">
+                                                Drive <Share2 className="w-4 h-4" />
+                                            </a>
+                                        </div>
 
-                                    {/* Translation Section */}
-                                    <div className="bg-slate-50/80 rounded-3xl p-8 mb-8">
-                                        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-6">
-                                            <div className="flex items-center gap-3 text-slate-800 text-lg font-bold">
-                                                <div className="w-10 h-10 rounded-xl bg-white border border-slate-100 flex items-center justify-center shadow-sm text-indigo-500">
-                                                    <Globe className="w-5 h-5" />
+                                        {/* Summary View */}
+                                        <div className="bg-slate-50 rounded-2xl p-6 border border-slate-100 mb-6 max-h-[300px] overflow-y-auto shadow-inner prose prose-slate prose-sm max-w-none">
+                                            <ReactMarkdown>
+                                                {typeof result.notes === 'string' ? JSON.parse(result.notes).summary || result.notes : result.notes.summary}
+                                            </ReactMarkdown>
+                                        </div>
+
+                                        {/* Translation Section */}
+                                        <div className="bg-slate-50/80 rounded-3xl p-8 mb-8">
+                                            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-6">
+                                                <div className="flex items-center gap-3 text-slate-800 text-lg font-bold">
+                                                    <div className="w-10 h-10 rounded-xl bg-white border border-slate-100 flex items-center justify-center shadow-sm text-indigo-500">
+                                                        <Globe className="w-5 h-5" />
+                                                    </div>
+                                                    Translate Notes
                                                 </div>
-                                                Translate Notes
+                                                <div className="flex gap-3 w-full md:w-auto">
+                                                    <select
+                                                        className="flex-1 md:w-48 bg-white border border-slate-200 text-slate-700 text-base rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-indigo-500 transition-all cursor-pointer hover:border-slate-300 shadow-sm"
+                                                        value={targetLang}
+                                                        onChange={(e) => setTargetLang(e.target.value)}
+                                                    >
+                                                        {LANGUAGES.map(lang => <option key={lang} value={lang}>{lang}</option>)}
+                                                    </select>
+                                                    <button
+                                                        onClick={handleTranslate}
+                                                        disabled={isTranslating}
+                                                        className="px-8 py-3 bg-indigo-600 text-white text-base font-bold rounded-xl hover:bg-indigo-700 transition-all shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed min-w-[120px]"
+                                                    >
+                                                        {isTranslating ? '...' : 'Translate'}
+                                                    </button>
+                                                </div>
                                             </div>
-                                            <div className="flex gap-3 w-full md:w-auto">
-                                                <select
-                                                    className="flex-1 md:w-48 bg-white border border-slate-200 text-slate-700 text-base rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-indigo-500 transition-all cursor-pointer hover:border-slate-300 shadow-sm"
-                                                    value={targetLang}
-                                                    onChange={(e) => setTargetLang(e.target.value)}
-                                                >
-                                                    {LANGUAGES.map(lang => <option key={lang} value={lang}>{lang}</option>)}
-                                                </select>
-                                                <button
-                                                    onClick={handleTranslate}
-                                                    disabled={isTranslating}
-                                                    className="px-8 py-3 bg-indigo-600 text-white text-base font-bold rounded-xl hover:bg-indigo-700 transition-all shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed min-w-[120px]"
-                                                >
-                                                    {isTranslating ? '...' : 'Translate'}
-                                                </button>
-                                            </div>
+
+                                            {/* Translated Content Display */}
+                                            {translatedContent && (
+                                                <div className="bg-white border border-slate-200 rounded-2xl p-8 text-base text-slate-700 animate-in fade-in zoom-in-95 duration-300 h-[500px] overflow-y-auto prose prose-blue prose-lg max-w-none break-words shadow-sm custom-scrollbar">
+                                                    <ReactMarkdown>
+                                                        {translatedContent}
+                                                    </ReactMarkdown>
+                                                </div>
+                                            )}
                                         </div>
 
-                                        {/* Translated Content Display */}
-                                        {translatedContent && (
-                                            <div className="bg-white border border-slate-200 rounded-2xl p-8 text-base text-slate-700 animate-in fade-in zoom-in-95 duration-300 h-[500px] overflow-y-auto prose prose-blue prose-lg max-w-none break-words shadow-sm custom-scrollbar">
-                                                <ReactMarkdown>
-                                                    {translatedContent}
-                                                </ReactMarkdown>
-                                            </div>
-                                        )}
+                                        <div className="flex justify-center">
+                                            <button onClick={() => window.location.reload()} className="w-full py-4 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-200">
+                                                Start New Recording
+                                            </button>
+                                        </div>
                                     </div>
+                                )
+                            }
 
-                                    <div className="flex justify-center">
-                                        <button onClick={() => window.location.reload()} className="w-full py-4 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-200">
-                                            Start New Recording
-                                        </button>
-                                    </div>
-                                </div>
-                            )}
+                        </div >
+                    </div >
+                </div >
 
-                        </div>
-                    </div>
-                </div>
-
-            </main>
-        </div>
+            </main >
+        </div >
     );
 }

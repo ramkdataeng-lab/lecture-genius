@@ -10,7 +10,7 @@ const LANGUAGES = [
 
 export default function SettingsPage() {
     const [folderStructure, setFolderStructure] = useState("date-subject");
-    const [defaultLanguage, setDefaultLanguage] = useState("Spanish");
+    const [defaultLanguage, setDefaultLanguage] = useState("English");
     const [showSuccess, setShowSuccess] = useState(false);
 
     useEffect(() => {
