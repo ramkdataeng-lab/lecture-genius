@@ -130,49 +130,79 @@ const DemoShowcase = () => {
   );
 };
 
-const WorkflowVisual = () => (
-  <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-4 relative w-full max-w-xs hidden xl:block">
-    <div className="absolute top-2 left-4 text-[10px] font-bold text-white/40 tracking-widest">AI PIPELINE</div>
-    <div className="grid grid-cols-2 gap-y-6 gap-x-8 items-center justify-items-center mt-4">
-      {/* Step 1: Voice */}
-      <div className="text-center group flex flex-col items-center relative">
-        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center mb-1 shadow-lg shadow-purple-900/20 ring-2 ring-white/10">
+const WorkflowVisual = () => {
+  return (
+    <div className="relative w-[320px] h-[180px] bg-slate-900/30 backdrop-blur-md border border-white/10 rounded-2xl p-4 hidden xl:block overflow-hidden shadow-inner shrink-0">
+      {/* Title */}
+      <div className="absolute top-2 left-4 text-[10px] font-bold text-white/40 tracking-[0.2em] z-10 uppercase">Live Processing</div>
+
+      {/* SVG Paths & Animations */}
+      <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 320 180" preserveAspectRatio="none" style={{ filter: 'drop-shadow(0 0 2px rgba(255,255,255,0.1))' }}>
+        <defs>
+          <linearGradient id="gradFlow" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor="#6366f1" />
+            <stop offset="100%" stopColor="#06b6d4" />
+          </linearGradient>
+        </defs>
+
+        {/* Path 1: Voice (Left Top) -> AI (Right Top) */}
+        <path d="M 60 45 H 260" stroke="url(#gradFlow)" strokeWidth="1.5" fill="none" strokeDasharray="4,4" className="opacity-30" />
+        <circle r="3" fill="#a5b4fc">
+          <animateMotion dur="2s" repeatCount="indefinite" path="M 60 45 H 260" keyPoints="0;1" keyTimes="0;1" calcMode="linear" />
+        </circle>
+
+        {/* Path 2: AI (Right Top) -> Cloud (Right Bottom) - Curved Exterior */}
+        <path d="M 280 65 Q 310 90 280 115" stroke="#22d3ee" strokeWidth="1.5" fill="none" strokeDasharray="4,4" className="opacity-30" />
+        <circle r="3" fill="#22d3ee">
+          <animateMotion dur="2.5s" repeatCount="indefinite" begin="1s" path="M 280 65 Q 310 90 280 115" />
+        </circle>
+
+        {/* Path 3: Trans (Left Bottom) -> Cloud (Right Bottom) */}
+        <path d="M 60 135 H 260" stroke="#f472b6" strokeWidth="1.5" fill="none" strokeDasharray="4,4" className="opacity-30" />
+        <circle r="3" fill="#f472b6">
+          <animateMotion dur="2s" repeatCount="indefinite" begin="0.8s" path="M 60 135 H 260" />
+        </circle>
+
+        {/* Connection: Voice -> Trans (Vertical) - Suggesting processing trigger */}
+        <path d="M 40 65 V 115" stroke="#f472b6" strokeWidth="1" fill="none" strokeDasharray="2,4" className="opacity-10" />
+      </svg>
+
+      {/* Nodes */}
+      {/* Top Left: Voice */}
+      <div className="absolute top-4 left-4 flex flex-col items-center group cursor-pointer z-20">
+        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-600 to-violet-600 border border-white/10 flex items-center justify-center shadow-[0_0_15px_rgba(124,58,237,0.3)] group-hover:scale-110 transition-transform duration-300">
           <Mic className="w-5 h-5 text-white" />
         </div>
-        <p className="text-[9px] text-indigo-200 font-bold uppercase tracking-wide">Capture</p>
-        {/* Arrow Right */}
-        <svg className="absolute top-4 -right-6 w-4 h-4 text-white/20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
+        <span className="text-[9px] text-indigo-200 mt-1 font-bold tracking-wide">AUDIO</span>
       </div>
 
-      {/* Step 2: AI */}
-      <div className="text-center group flex flex-col items-center">
-        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center mb-1 shadow-lg shadow-cyan-900/20 ring-2 ring-white/20 animate-pulse">
-          <Brain className="w-5 h-5 text-white" />
+      {/* Top Right: AI */}
+      <div className="absolute top-4 right-4 flex flex-col items-center group cursor-pointer z-20">
+        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-600 to-blue-600 border border-white/10 flex items-center justify-center shadow-[0_0_15px_rgba(8,145,178,0.3)] group-hover:scale-110 transition-transform duration-300 relative overflow-hidden">
+          <div className="absolute inset-0 bg-white/20 animate-pulse"></div>
+          <Brain className="w-5 h-5 text-white relative z-10" />
         </div>
-        <p className="text-[9px] text-cyan-200 font-bold uppercase tracking-wide">Gemini 3</p>
+        <span className="text-[9px] text-cyan-200 mt-1 font-bold tracking-wide">GEMINI 3</span>
       </div>
 
-      {/* Step 3: Trans */}
-      <div className="text-center group flex flex-col items-center relative">
-        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-pink-500 to-rose-500 flex items-center justify-center mb-1 shadow-lg shadow-rose-900/20 ring-2 ring-white/10">
+      {/* Bottom Left: Trans */}
+      <div className="absolute bottom-4 left-4 flex flex-col items-center group cursor-pointer z-20">
+        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-pink-500 to-rose-500 border border-white/10 flex items-center justify-center shadow-[0_0_15px_rgba(244,114,182,0.3)] group-hover:scale-110 transition-transform duration-300">
           <Languages className="w-5 h-5 text-white" />
         </div>
-        <p className="text-[9px] text-pink-200 font-bold uppercase tracking-wide">Translate</p>
-        {/* Arrow Up-Right (Diagonal logic? No just right to next grid?) */}
-        {/* Arrow Right */}
-        <svg className="absolute top-4 -right-6 w-4 h-4 text-white/20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
+        <span className="text-[9px] text-pink-200 mt-1 font-bold tracking-wide">TRANS</span>
       </div>
 
-      {/* Step 4: Storage */}
-      <div className="text-center group flex flex-col items-center">
-        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center mb-1 shadow-lg shadow-teal-900/20 ring-2 ring-white/10">
+      {/* Bottom Right: Storage */}
+      <div className="absolute bottom-4 right-4 flex flex-col items-center group cursor-pointer z-20">
+        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 border border-white/10 flex items-center justify-center shadow-[0_0_15px_rgba(16,185,129,0.3)] group-hover:scale-110 transition-transform duration-300">
           <FolderOpen className="w-5 h-5 text-white" />
         </div>
-        <p className="text-[9px] text-emerald-200 font-bold uppercase tracking-wide">Drive</p>
+        <span className="text-[9px] text-emerald-200 mt-1 font-bold tracking-wide">DRIVE</span>
       </div>
     </div>
-  </div>
-);
+  );
+};
 
 export default function Home() {
   const { data: session, status } = useSession();
