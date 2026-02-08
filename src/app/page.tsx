@@ -7,14 +7,15 @@ import Image from "next/image";
 import { Mic, FolderOpen, Brain, PlayCircle, FileText, ExternalLink } from "lucide-react";
 import { useState, useEffect } from "react";
 
+// Gemini Icon with HIGH CONTRAST (White/Cyan) for dark background
 const GeminiIcon = ({ className }: { className?: string }) => (
   <svg viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
     <path d="M256 0c0 0-30 140-140 140S0 256 0 256s140 0 140 140 30 116 30 116 0-110 30-116 172-24 172-24-142 0-172-140S256 0 256 0z" fill="url(#g1)" />
     <path d="M400 60c0 0-20 60-60 60s-60 60-60 60 60 0 60 60 20 60 20 60 0-60 20-60 60-20 60-20-40 0-60-60S400 60 400 60z" fill="url(#g1)" />
     <defs>
       <linearGradient id="g1" x1="0" y1="0" x2="512" y2="512" gradientUnits="userSpaceOnUse">
-        <stop offset="0" stopColor="#4aa2f2" />
-        <stop offset="1" stopColor="#a55eea" />
+        <stop offset="0" stopColor="#FFFFFF" />
+        <stop offset="1" stopColor="#06b6d4" />
       </linearGradient>
     </defs>
   </svg>
@@ -59,7 +60,7 @@ const DemoShowcase = () => {
   }
 
   return (
-    <div className="bg-white rounded-2xl border border-blue-100 shadow-xl overflow-hidden ring-4 ring-blue-50/50 transition-all">
+    <div className="bg-white rounded-2xl border border-blue-100 shadow-xl overflow-hidden ring-4 ring-blue-50/50 transition-all h-full">
       {/* Header of Demo */}
       <div className="bg-slate-900 text-white p-6 flex justify-between items-start">
         <div>
@@ -75,13 +76,13 @@ const DemoShowcase = () => {
       {/* Content Tabs */}
       <div className="flex border-b border-slate-100 overflow-x-auto">
         <button onClick={() => setActiveTab('summary')} className={`flex-1 py-3 text-sm font-bold border-b-2 transition-colors px-4 whitespace-nowrap ${activeTab === 'summary' ? 'border-blue-500 text-blue-600' : 'border-transparent text-slate-500 hover:text-slate-700'}`}>Summary</button>
-        <button onClick={() => setActiveTab('points')} className={`flex-1 py-3 text-sm font-bold border-b-2 transition-colors px-4 whitespace-nowrap ${activeTab === 'points' ? 'border-purple-500 text-purple-600' : 'border-transparent text-slate-500 hover:text-slate-700'}`}>Key Points</button>
+        <button onClick={() => setActiveTab('points')} className={`flex-1 py-3 text-sm font-bold border-b-2 transition-colors px-4 whitespace-nowrap ${activeTab === 'points' ? 'border-purple-500 text-purple-600' : 'border-transparent text-slate-500 hover:text-slate-700'}`}>Points</button>
         <button onClick={() => setActiveTab('translation')} className={`flex-1 py-3 text-sm font-bold border-b-2 transition-colors px-4 whitespace-nowrap ${activeTab === 'translation' ? 'border-green-500 text-green-600' : 'border-transparent text-slate-500 hover:text-slate-700'}`}>Translation</button>
         <button onClick={() => setActiveTab('quiz')} className={`flex-1 py-3 text-sm font-bold border-b-2 transition-colors px-4 whitespace-nowrap ${activeTab === 'quiz' ? 'border-pink-500 text-pink-600' : 'border-transparent text-slate-500 hover:text-slate-700'}`}>Quiz</button>
       </div>
 
       {/* Body */}
-      <div className="p-6 bg-slate-50 min-h-[200px]">
+      <div className="p-6 bg-slate-50 min-h-[200px] overflow-y-auto max-h-[300px]">
         {activeTab === 'summary' && (
           <div className="animate-in fade-in duration-300">
             <p className="text-slate-700 leading-relaxed text-lg">{DEMO_DATA.summary}</p>
@@ -137,23 +138,18 @@ export default function Home() {
 
   useEffect(() => {
     if (session) {
-      // Fetch Folder Link
       fetch('/api/drive-folder')
         .then(res => res.json())
-        .then(data => {
-          if (data.webViewLink) setFolderLink(data.webViewLink);
-        })
+        .then(data => { if (data.webViewLink) setFolderLink(data.webViewLink); })
         .catch(err => console.error(err));
 
-      // Fetch Recent Activity
       setLoadingActivity(true);
       fetch('/api/history')
         .then(res => res.json())
         .then(data => {
           if (data.files) {
-            // Filter for _Notes.json only
             const notes = data.files.filter((f: any) => f.name.includes('_Notes.json'));
-            setRecentActivity(notes.slice(0, 5)); // Top 5
+            setRecentActivity(notes.slice(0, 5));
           }
         })
         .catch(err => console.error(err))
@@ -177,8 +173,9 @@ export default function Home() {
 
       <main className="flex-1 md:ml-64 p-8 overflow-y-auto">
 
-        {/* Header Section */}
+        {/* 1. Header Section */}
         <div className="mb-8">
+          {/* Mobile Nav */}
           <div className="flex justify-between items-center bg-white p-4 rounded-xl shadow-sm border border-slate-100 md:hidden mb-6">
             <div className="flex items-center gap-3">
               <Image src="/logo.png" width={32} height={32} alt="Logo" />
@@ -192,45 +189,40 @@ export default function Home() {
           </div>
 
           <div className="relative overflow-hidden rounded-3xl bg-gradient-header p-8 md:p-12 text-white shadow-lg shadow-slate-300">
-            <div className="relative z-10 max-w-3xl">
-              <div className="flex flex-col md:flex-row md:items-center gap-4 mb-4 opacity-90">
-                <div className="flex items-center gap-3 bg-white/10 backdrop-blur-md px-5 py-3 rounded-full border border-white/20 shadow-lg">
-                  <GeminiIcon className="w-8 h-8 animate-pulse drop-shadow-lg" />
-                  <span className="text-lg font-bold tracking-wide text-white drop-shadow-md">POWERED BY GOOGLE GEMINI 3</span>
+            {/* NEW Header Layout: Flex Context */}
+            <div className="relative z-10 flex flex-col md:flex-row justify-between items-start gap-8">
+
+              {/* Left: Title & Actions */}
+              <div className="max-w-xl">
+                <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-white leading-tight mb-4">
+                  Democratizing Education Globally <span className="text-cyan-300">with AI</span>
+                </h1>
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="h-px w-12 bg-indigo-300/50"></div>
+                  <p className="text-indigo-100 font-medium">Next-Gen Multimodal Learning Assistant</p>
+                </div>
+
+                <div className="flex flex-wrap gap-4 items-center mt-6">
+                  <Link href="/record" className="bg-white text-violet-700 px-6 py-3 rounded-xl font-bold shadow-lg hover:bg-indigo-50 transition-colors flex items-center gap-2">
+                    <Mic className="w-5 h-5" /> Start New Recording
+                  </Link>
+                  {!session && (
+                    <button onClick={() => window.location.href = "/api/auth/signin/google"} className="bg-white/20 text-white px-6 py-3 rounded-xl font-bold hover:bg-white/30 transition-colors backdrop-blur-sm border border-white/20 flex items-center gap-2">
+                      Sign in with Google
+                    </button>
+                  )}
+                  {session && (
+                    <Link href={folderLink} target="_blank" className="bg-white/20 text-white px-6 py-3 rounded-xl font-bold hover:bg-white/30 transition-colors backdrop-blur-sm border border-white/20 flex items-center gap-2">
+                      <FolderOpen className="w-5 h-5" /> Drive
+                    </Link>
+                  )}
                 </div>
               </div>
 
-              <div className="mb-2">
-                <h1 className="text-3xl md:text-5xl font-bold tracking-tight text-white leading-tight">
-                  Democratizing Education Globally <span className="text-cyan-300">with AI</span>
-                </h1>
-              </div>
-
-              <div className="flex items-center gap-3 mb-6">
-                <div className="h-px w-12 bg-indigo-300/50"></div>
-                <p className="text-indigo-100 font-medium">Next-Gen Multimodal Learning Assistant</p>
-              </div>
-
-              <p className="text-indigo-50 text-lg mb-8 leading-relaxed font-medium max-w-2xl">
-                {userName}, ready to capture your next lecture? Experience 1M+ token context and reasoning for seamless transcription, summarization, and translation.
-              </p>
-
-              <div className="flex flex-wrap gap-4 items-center">
-                <Link href="/record" className="bg-white text-violet-700 px-6 py-3 rounded-xl font-bold shadow-lg hover:bg-indigo-50 transition-colors flex items-center gap-2">
-                  <Mic className="w-5 h-5" /> Start New Recording
-                </Link>
-
-                {!session && (
-                  <button onClick={() => window.location.href = "/api/auth/signin/google"} className="bg-white/20 text-white px-6 py-3 rounded-xl font-bold hover:bg-white/30 transition-colors backdrop-blur-sm border border-white/20 flex items-center gap-2">
-                    <svg className="w-5 h-5 bg-white rounded-full p-0.5" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" /><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" /><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05" /><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" /></svg>
-                    Sign in with Google
-                  </button>
-                )}
-                {session && (
-                  <Link href={folderLink} target="_blank" className="bg-white/20 text-white px-6 py-3 rounded-xl font-bold hover:bg-white/30 transition-colors backdrop-blur-sm border border-white/20 flex items-center gap-2">
-                    <FolderOpen className="w-5 h-5" /> Drive
-                  </Link>
-                )}
+              {/* Right: Badge (Extreme Right) */}
+              <div className="flex items-center gap-3 bg-slate-900/40 backdrop-blur-md px-5 py-3 rounded-full border border-white/20 shadow-2xl hover:scale-105 transition-transform cursor-default shrink-0 self-start mt-2 md:mt-0">
+                <GeminiIcon className="w-8 h-8 animate-pulse drop-shadow-[0_0_10px_rgba(255,255,255,0.5)]" />
+                <span className="text-lg font-bold tracking-wide text-white drop-shadow-md whitespace-nowrap">POWERED BY GEMINI 3</span>
               </div>
             </div>
 
@@ -240,7 +232,7 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Quick Actions Grid */}
+        {/* 2. Quick Actions */}
         <div className="mb-10">
           <h2 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4 px-1">Actions</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -270,90 +262,88 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Social Cause / Mission Section */}
-        <div className="mb-10">
-          <h2 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4 px-1">Our Mission</h2>
-          <div className="bg-gradient-to-r from-violet-500 to-indigo-600 rounded-2xl p-6 md:p-8 text-white shadow-md relative overflow-hidden">
-            <div className="relative z-10">
-              <h3 className="text-2xl font-bold mb-3 flex items-center gap-2">
-                <span className="text-cyan-200">Democratizing Education</span> for the Global Student
-              </h3>
-              <p className="text-indigo-100 leading-relaxed max-w-3xl">
-                LectureGenius eliminates learning boundaries by integrating multiple languages, empowering every student—local or international—to become a global scholar. We believe in a world where you can listen to any class, in any language, breaking down barriers to knowledge one lecture at a time.
-              </p>
+        {/* 3. Layout Grid: Mission (Left) & Demo (Right) - NEW SIDE-BY-SIDE */}
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-8 mb-10">
+          {/* Left: Mission Statement (2 cols) */}
+          <div className="xl:col-span-2 flex flex-col">
+            <h2 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4 px-1">Our Mission</h2>
+            <div className="bg-gradient-to-r from-violet-500 to-indigo-600 rounded-2xl p-8 text-white shadow-md relative overflow-hidden flex-1 flex flex-col justify-center">
+              <div className="relative z-10">
+                <h3 className="text-3xl font-bold mb-4 flex items-center gap-2 leading-tight">
+                  <span className="text-cyan-200">Democratizing Education</span> for the Global Student
+                </h3>
+                <p className="text-indigo-100 leading-relaxed text-lg max-w-2xl">
+                  LectureGenius eliminates learning boundaries by integrating multiple languages, empowering every student—local or international—to become a global scholar. We believe in a world where you can listen to any class, in any language, breaking down barriers to knowledge one lecture at a time.
+                </p>
+              </div>
+              {/* Decorative background circle */}
+              <div className="absolute -right-12 -bottom-24 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
             </div>
-            {/* Decorative background circle */}
-            <div className="absolute -right-12 -bottom-24 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
+          </div>
+
+          {/* Right: Demo Showcase (1 col) */}
+          <div className="xl:col-span-1 h-full">
+            <DemoShowcase />
           </div>
         </div>
 
-        {/* Layout Grid: Recent Activity & Demo */}
-        <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
+        {/* 4. Recent Activity (Full Width Below) */}
+        <div id="recent-activity" className="scroll-mt-10 mb-10">
+          <h2 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4 px-1">Recent Activity</h2>
 
-          {/* Left Col: Recent Activity */}
-          <div className="xl:col-span-2" id="recent-activity">
-            <h2 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4 px-1">Recent Activity</h2>
-
-            {loadingActivity ? (
-              <div className="bg-white p-8 rounded-2xl border border-slate-100 shadow-sm text-center">
-                <div className="animate-spin w-8 h-8 border-4 border-indigo-200 border-t-indigo-600 rounded-full mx-auto mb-4"></div>
-                <p className="text-sm text-slate-400">Loading your recent notes...</p>
-              </div>
-            ) : recentActivity.length > 0 ? (
-              <div className="grid grid-cols-1 gap-4">
-                {recentActivity.map((file) => (
-                  <div key={file.id} className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all flex flex-col md:flex-row gap-6 md:items-start group">
-                    <div className="bg-indigo-50 w-16 h-16 rounded-xl flex items-center justify-center shrink-0">
-                      <FileText className="w-8 h-8 text-indigo-600" />
+          {loadingActivity ? (
+            <div className="bg-white p-8 rounded-2xl border border-slate-100 shadow-sm text-center">
+              <div className="animate-spin w-8 h-8 border-4 border-indigo-200 border-t-indigo-600 rounded-full mx-auto mb-4"></div>
+              <p className="text-sm text-slate-400">Loading your recent notes...</p>
+            </div>
+          ) : recentActivity.length > 0 ? (
+            <div className="grid grid-cols-1 gap-4">
+              {recentActivity.map((file) => (
+                <div key={file.id} className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all flex flex-col md:flex-row gap-6 md:items-start group">
+                  <div className="bg-indigo-50 w-16 h-16 rounded-xl flex items-center justify-center shrink-0">
+                    <FileText className="w-8 h-8 text-indigo-600" />
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex justify-between items-start">
+                      <h3 className="font-bold text-slate-800 text-lg mb-1 group-hover:text-indigo-600 transition-colors">
+                        {file.name.replace('_Notes.json', '')}
+                      </h3>
+                      <span className="text-xs font-semibold text-slate-400 bg-slate-100 px-2 py-1 rounded">
+                        {new Date(file.createdTime).toLocaleDateString()}
+                      </span>
                     </div>
-                    <div className="flex-1">
-                      <div className="flex justify-between items-start">
-                        <h3 className="font-bold text-slate-800 text-lg mb-1 group-hover:text-indigo-600 transition-colors">
-                          {file.name.replace('_Notes.json', '')}
-                        </h3>
-                        <span className="text-xs font-semibold text-slate-400 bg-slate-100 px-2 py-1 rounded">
-                          {new Date(file.createdTime).toLocaleDateString()}
-                        </span>
-                      </div>
 
-                      <p className="text-sm text-slate-500 leading-relaxed mb-4 line-clamp-2">
-                        {file.description || "No summary available."}
-                      </p>
+                    <p className="text-sm text-slate-500 leading-relaxed mb-4 line-clamp-2">
+                      {file.description || "No summary available."}
+                    </p>
 
-                      <div className="flex items-center gap-4">
-                        <Link
-                          href={file.webViewLink}
-                          target="_blank"
-                          className="text-sm font-bold text-indigo-600 hover:text-indigo-800 flex items-center gap-1"
-                        >
-                          <ExternalLink className="w-4 h-4" /> Open in Drive
-                        </Link>
-                        <button
-                          onClick={() => window.open(file.parents?.[0] ? `https://drive.google.com/drive/folders/${file.parents[0]}` : file.webViewLink, '_blank')}
-                          className="text-sm font-bold text-slate-500 hover:text-slate-700 flex items-center gap-1"
-                        >
-                          <FolderOpen className="w-4 h-4" /> Open Folder
-                        </button>
-                      </div>
+                    <div className="flex items-center gap-4">
+                      <Link
+                        href={file.webViewLink}
+                        target="_blank"
+                        className="text-sm font-bold text-indigo-600 hover:text-indigo-800 flex items-center gap-1"
+                      >
+                        <ExternalLink className="w-4 h-4" /> Open in Drive
+                      </Link>
+                      <button
+                        onClick={() => window.open(file.parents?.[0] ? `https://drive.google.com/drive/folders/${file.parents[0]}` : file.webViewLink, '_blank')}
+                        className="text-sm font-bold text-slate-500 hover:text-slate-700 flex items-center gap-1"
+                      >
+                        <FolderOpen className="w-4 h-4" /> Open Folder
+                      </button>
                     </div>
                   </div>
-                ))}
-              </div>
-            ) : (
-              <div className="bg-white p-2 rounded-2xl border border-slate-100 shadow-sm space-y-1">
-                <div className="p-8 text-center text-slate-400 flex flex-col items-center">
-                  <Mic className="w-12 h-12 text-slate-200 mb-4" />
-                  <p className="text-sm font-medium">Your recent recordings will appear here once processed.</p>
                 </div>
+              ))}
+            </div>
+          ) : (
+            <div className="bg-white p-2 rounded-2xl border border-slate-100 shadow-sm space-y-1">
+              <div className="p-8 text-center text-slate-400 flex flex-col items-center">
+                <Mic className="w-12 h-12 text-slate-200 mb-4" />
+                <p className="text-sm font-medium">Your recent recordings will appear here once processed.</p>
               </div>
-            )}
-          </div>
-
-          {/* Right Col: Demo Showcase (Sticky?) */}
-          <div className="xl:col-span-1">
-            <DemoShowcase />
-          </div>
-
+            </div>
+          )}
         </div>
 
       </main>
