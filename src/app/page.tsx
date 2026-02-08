@@ -351,6 +351,23 @@ export default function Home() {
           )}
         </div>
 
+
+        {/* 5. Video Demo Section */}
+        <div className="mb-10 text-center">
+          <h2 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4 px-1">Watch Demo</h2>
+          <div className="relative w-full max-w-4xl mx-auto aspect-video rounded-2xl overflow-hidden shadow-lg border border-slate-200 bg-black">
+            <iframe
+              width="100%"
+              height="100%"
+              src="https://www.youtube.com/embed/YoZxvtz7gfQ"
+              title="LectureGenius Demo"
+              style={{ border: 0 }}
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            />
+          </div>
+        </div>
+
       </main>
     </div>
   );
